@@ -28,6 +28,8 @@ React, Vite, TypeScript, TailwindCSS, Framer Motion, Zustand, date-fns, Lucide R
 
 ## Getting started
 
+**Live Demo:** https://rewind-gules.vercel.app/
+
 ```bash
 npm install
 npm run dev
