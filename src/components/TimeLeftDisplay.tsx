@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
+import React from "react";
 import { motion } from "framer-motion";
 import { endOfDay } from "date-fns";
 import { useStore } from "../store";
 
-export default function TimeLeftDisplay() {
+function TimeLeftDisplay() {
   const [timeLeft, setTimeLeft] = useState({
     hours: 0,
     minutes: 0,
@@ -68,3 +69,5 @@ export default function TimeLeftDisplay() {
     </div>
   );
 }
+
+export default React.memo(TimeLeftDisplay);

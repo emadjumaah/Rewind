@@ -66,7 +66,7 @@ function DeadlineCard({
       : new Date(deadline.deadline);
 
   useEffect(() => {
-    const interval = setInterval(() => setNow(new Date()), 1000);
+    const interval = setInterval(() => setNow(new Date()), 5000);
     return () => clearInterval(interval);
   }, []);
 

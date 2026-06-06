@@ -53,7 +53,7 @@ export default function App() {
             backgroundPosition: ['0% 0%', '100% 100%', '0% 0%'],
           }}
           transition={{
-            duration: 30,
+            duration: 60,
             repeat: Infinity,
             ease: 'linear',
           }}
@@ -65,14 +65,14 @@ export default function App() {
             backgroundPosition: ['100% 100%', '0% 0%', '100% 100%'],
           }}
           transition={{
-            duration: 35,
+            duration: 70,
             repeat: Infinity,
             ease: 'linear',
           }}
           style={{ backgroundSize: '300% 300%' }}
         />
-        {/* Floating particles */}
-        {[...Array(15)].map((_, i) => (
+        {/* Floating particles - reduced for performance */}
+        {[...Array(5)].map((_, i) => (
           <motion.div
             key={i}
             className="absolute w-0.5 h-0.5 bg-cyan-500/20 rounded-full"
@@ -86,7 +86,7 @@ export default function App() {
               opacity: [0, 0.4, 0],
             }}
             transition={{
-              duration: 15 + Math.random() * 25,
+              duration: 20 + Math.random() * 30,
               repeat: Infinity,
               ease: 'easeInOut',
               delay: Math.random() * 10,

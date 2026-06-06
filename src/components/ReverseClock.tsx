@@ -8,7 +8,7 @@ export default function ReverseClock() {
   const { settings } = useStore()
 
   useEffect(() => {
-    const timer = setInterval(() => setTime(new Date()), 50) // Higher refresh rate for smooth animation
+    const timer = setInterval(() => setTime(new Date()), 100) // Reduced refresh rate for better performance
     return () => clearInterval(timer)
   }, [])
 
@@ -16,7 +16,7 @@ export default function ReverseClock() {
     // Breathing glow effect
     const breathingInterval = setInterval(() => {
       setGlowIntensity(0.3 + Math.sin(Date.now() / 1000) * 0.2)
-    }, 50)
+    }, 100)
     return () => clearInterval(breathingInterval)
   }, [])
 

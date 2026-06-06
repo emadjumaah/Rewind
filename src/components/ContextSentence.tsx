@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import React from 'react'
 import { useStore, Deadline } from '../store'
 import { differenceInHours } from 'date-fns'
 
@@ -125,7 +126,7 @@ const getContextualMessage = (deadlines: Deadline[], currentTime: Date): string 
   return defaultMessages[Math.floor(Math.random() * defaultMessages.length)]
 }
 
-export default function ContextSentence() {
+function ContextSentence() {
   const { deadlines } = useStore()
   const [context, setContext] = useState('')
 
@@ -147,3 +148,5 @@ export default function ContextSentence() {
     </div>
   )
 }
+
+export default React.memo(ContextSentence)
