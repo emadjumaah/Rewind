@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useStore } from '../store'
-import { X, Clock, Focus, Settings as SettingsIcon, Plus } from 'lucide-react'
+import { X, Clock, Settings as SettingsIcon, Plus } from 'lucide-react'
 
 export default function CommandPalette() {
   const { isCommandPaletteOpen, setCommandPaletteOpen, toggleFocusMode } = useStore()

@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion'
 import { useStore, Deadline } from '../store'
-import { differenceInDays, differenceInHours, differenceInMinutes } from 'date-fns'
+import { differenceInDays, differenceInHours } from 'date-fns'
 import { X } from 'lucide-react'
 
 function getUrgencyColor(deadline: Date): string {

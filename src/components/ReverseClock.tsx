@@ -122,7 +122,6 @@ const contexts = [
 ]
 
 export default function ReverseClock() {
-  const { settings } = useStore()
   const [time, setTime] = useState(new Date())
   const [context, setContext] = useState('')
 

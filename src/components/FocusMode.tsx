@@ -18,7 +18,7 @@ export default function FocusMode() {
   }, [isFocusMode, settings.focusSessionLength])
 
   useEffect(() => {
-    let interval: NodeJS.Timeout
+    let interval: ReturnType<typeof setInterval>
     if (isActive && timeLeft > 0) {
       interval = setInterval(() => {
         setTimeLeft((prev) => prev - 1)

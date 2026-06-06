@@ -3,7 +3,6 @@ import ReverseClock from './components/ReverseClock'
 import DeadlineCards from './components/DeadlineCards'
 import TimeAnalytics from './components/TimeAnalytics'
 import FocusMode from './components/FocusMode'
-import QuoteFeed from './components/QuoteFeed'
 import CommandPalette from './components/CommandPalette'
 import Settings from './components/Settings'
 
