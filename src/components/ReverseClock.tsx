@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion } from 'framer-motion'
 import { useStore } from '../store'
 
 export default function ReverseClock() {
@@ -15,7 +15,7 @@ export default function ReverseClock() {
   useEffect(() => {
     // Breathing glow effect
     const breathingInterval = setInterval(() => {
-      setGlowIntensity(prev => 0.3 + Math.sin(Date.now() / 1000) * 0.2)
+      setGlowIntensity(0.3 + Math.sin(Date.now() / 1000) * 0.2)
     }, 50)
     return () => clearInterval(breathingInterval)
   }, [])
@@ -153,10 +153,11 @@ export default function ReverseClock() {
               y={y}
               textAnchor="middle"
               dominantBaseline="middle"
-              fill="rgba(255,255,255,0.7)"
-              fontSize="18"
-              fontWeight="500"
-              letterSpacing="1"
+              fill="rgba(255,255,255,0.8)"
+              fontSize="20"
+              fontWeight="600"
+              letterSpacing="0.5"
+              fontFamily="'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace"
             >
               {num}
             </text>

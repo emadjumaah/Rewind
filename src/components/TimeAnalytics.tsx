@@ -45,12 +45,6 @@ export default function TimeAnalytics() {
     return 'rgba(239, 68, 68, 0.8)'
   }
 
-  const getGradientColor = (progress: number) => {
-    if (progress > 0.6) return 'from-cyan-500/50 to-cyan-400/50'
-    if (progress > 0.3) return 'from-amber-500/50 to-amber-400/50'
-    return 'from-red-500/50 to-red-400/50'
-  }
-
   return (
     <div className="space-y-2">
       <h2 className="text-lg font-semibold text-gray-200">Time Remaining</h2>

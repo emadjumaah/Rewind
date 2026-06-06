@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useStore, Deadline } from '../store'
-import { differenceInHours, differenceInDays, differenceInWeeks, differenceInMonths } from 'date-fns'
+import { differenceInHours } from 'date-fns'
 
 const getContextualMessage = (deadlines: Deadline[], currentTime: Date): string => {
   const hour = currentTime.getHours()

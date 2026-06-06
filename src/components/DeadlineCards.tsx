@@ -21,14 +21,12 @@ function getUrgencyRingColor(deadline: Date): string {
   return 'rgba(6, 182, 212, 0.8)'
 }
 
-function getUrgencyPulse(deadline: Date): boolean {
-  const hoursLeft = differenceInHours(deadline, new Date())
+function getUrgencyPulse(): boolean {
   return false // Disable pulse for all urgency levels
 }
 
 function getUrgencyVibration(deadline: Date): boolean {
-  const hoursLeft = differenceInHours(deadline, new Date())
-  return hoursLeft < 12
+  return false // Disable vibration
 }
 
 function getUrgencyText(deadline: Date, estimatedHours: number): string {
@@ -57,7 +55,7 @@ function DeadlineCard({ deadline, onRemove, onEdit }: { deadline: Deadline; onRe
   const progress = Math.max(0, Math.min(1, hoursLeft / totalHours))
   const circumference = 2 * Math.PI * 45
   const strokeDashoffset = circumference * (1 - progress)
-  const shouldPulse = getUrgencyPulse(deadlineDate)
+  const shouldPulse = getUrgencyPulse()
   const shouldVibrate = getUrgencyVibration(deadlineDate)
   const ringColor = getUrgencyRingColor(deadlineDate)
 

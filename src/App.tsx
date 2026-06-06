@@ -4,6 +4,7 @@ import ReverseClock from './components/ReverseClock'
 import ContextSentence from './components/ContextSentence'
 import DeadlineCards from './components/DeadlineCards'
 import TimeAnalytics from './components/TimeAnalytics'
+import TimeLeftDisplay from './components/TimeLeftDisplay'
 import FocusMode from './components/FocusMode'
 import CommandPalette from './components/CommandPalette'
 import Settings from './components/Settings'
@@ -146,8 +147,9 @@ export default function App() {
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6, delay: 0.3 }}
-            className="col-span-7 grid grid-rows-2 gap-3 overflow-y-auto"
+            className="col-span-7 grid grid-rows-3 gap-3 overflow-y-auto"
           >
+            <TimeLeftDisplay />
             <div className="glass rounded-xl p-3">
               <DeadlineCards />
             </div>
