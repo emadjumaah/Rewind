@@ -1,7 +1,9 @@
+import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { useStore, Deadline } from '../store'
 import { differenceInDays, differenceInHours } from 'date-fns'
-import { X } from 'lucide-react'
+import { X, Plus, Edit } from 'lucide-react'
+import DeadlineModal from './DeadlineModal'
 
 function getUrgencyColor(deadline: Date): string {
   const hoursLeft = differenceInHours(deadline, new Date())
@@ -35,7 +37,7 @@ function getUrgencyText(deadline: Date, estimatedHours: number): string {
   return `${daysLeft} days left. You need ${estimatedHours}h. This is fine. Probably.`
 }
 
-function DeadlineCard({ deadline, onRemove }: { deadline: Deadline; onRemove: (id: string) => void }) {
+function DeadlineCard({ deadline, onRemove, onEdit }: { deadline: Deadline; onRemove: (id: string) => void; onEdit: (deadline: Deadline) => void }) {
   const now = new Date()
   const deadlineDate = deadline.deadline instanceof Date ? deadline.deadline : new Date(deadline.deadline)
   const totalHours = differenceInHours(deadlineDate, new Date(deadlineDate.getTime() - 30 * 24 * 60 * 60 * 1000))
@@ -100,21 +102,60 @@ function DeadlineCard({ deadline, onRemove }: { deadline: Deadline; onRemove: (i
           </p>
         </div>
       </div>
+
+      <button
+        onClick={() => onEdit(deadline)}
+        className="absolute bottom-2 right-2 text-gray-500 hover:text-gray-300 transition-colors"
+        title="Edit deadline"
+      >
+        <Edit size={14} />
+      </button>
     </motion.div>
   )
 }
 
 export default function DeadlineCards() {
   const { deadlines, removeDeadline } = useStore()
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [editingDeadline, setEditingDeadline] = useState<Deadline | undefined>()
+
+  const handleAdd = () => {
+    setEditingDeadline(undefined)
+    setIsModalOpen(true)
+  }
+
+  const handleEdit = (deadline: Deadline) => {
+    setEditingDeadline(deadline)
+    setIsModalOpen(true)
+  }
 
   return (
     <div className="space-y-2">
-      <h2 className="text-lg font-semibold text-gray-200">Deadlines</h2>
+      <div className="flex justify-between items-center">
+        <h2 className="text-lg font-semibold text-gray-200">Deadlines</h2>
+        <button
+          onClick={handleAdd}
+          className="text-cyan-400 hover:text-cyan-300 transition-colors"
+          title="Add deadline"
+        >
+          <Plus size={20} />
+        </button>
+      </div>
       <div className="grid gap-2">
         {deadlines.map((deadline) => (
-          <DeadlineCard key={deadline.id} deadline={deadline} onRemove={removeDeadline} />
+          <DeadlineCard
+            key={deadline.id}
+            deadline={deadline}
+            onRemove={removeDeadline}
+            onEdit={handleEdit}
+          />
         ))}
       </div>
+      <DeadlineModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        deadline={editingDeadline}
+      />
     </div>
   )
 }

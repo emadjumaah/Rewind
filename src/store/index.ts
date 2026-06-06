@@ -21,6 +21,7 @@ interface AppState {
   isFocusMode: boolean
   isCommandPaletteOpen: boolean
   addDeadline: (deadline: Omit<Deadline, 'id'>) => void
+  updateDeadline: (id: string, deadline: Omit<Deadline, 'id'>) => void
   removeDeadline: (id: string) => void
   updateSettings: (settings: Partial<Settings>) => void
   toggleFocusMode: () => void
@@ -63,6 +64,12 @@ export const useStore = create<AppState>()(
       addDeadline: (deadline) =>
         set((state) => ({
           deadlines: [...state.deadlines, { ...deadline, id: Date.now().toString() }],
+        })),
+      updateDeadline: (id, deadline) =>
+        set((state) => ({
+          deadlines: state.deadlines.map((d) =>
+            d.id === id ? { ...d, ...deadline } : d
+          ),
         })),
       removeDeadline: (id) =>
         set((state) => ({
