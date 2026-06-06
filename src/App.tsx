@@ -8,12 +8,14 @@ import TimeLeftDisplay from './components/TimeLeftDisplay'
 import FocusMode from './components/FocusMode'
 import CommandPalette from './components/CommandPalette'
 import Settings from './components/Settings'
+import About from './components/About'
 import { useStore } from './store'
-import { Maximize2, Settings as SettingsIcon, Clock } from 'lucide-react'
+import { Maximize2, Settings as SettingsIcon, Clock, Info } from 'lucide-react'
 
 export default function App() {
   const { settings, toggleFocusMode } = useStore()
   const [isSettingsOpen, setIsSettingsOpen] = useState(false)
+  const [isAboutOpen, setIsAboutOpen] = useState(false)
 
   const toggleFullscreen = () => {
     if (!document.fullscreenElement) {
@@ -96,6 +98,7 @@ export default function App() {
       <FocusMode />
       <CommandPalette />
       <Settings isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
+      <About isOpen={isAboutOpen} onClose={() => setIsAboutOpen(false)} />
 
       <div className="h-full flex flex-col gap-2 relative z-10">
         <motion.div
@@ -106,6 +109,13 @@ export default function App() {
         >
           <h1 className={`text-2xl font-light tracking-tight ${settings.darkMode ? 'text-gray-100' : 'text-gray-900'}`}>Rewind</h1>
           <div className="flex gap-2">
+            <button
+              onClick={() => setIsAboutOpen(true)}
+              className={`${settings.darkMode ? 'text-gray-500 hover:text-gray-300' : 'text-gray-400 hover:text-gray-600'} transition-colors hover:scale-110 active:scale-95`}
+              title="About"
+            >
+              <Info size={20} />
+            </button>
             <button
               onClick={toggleFocusMode}
               className={`${settings.darkMode ? 'text-gray-500 hover:text-gray-300' : 'text-gray-400 hover:text-gray-600'} transition-colors hover:scale-110 active:scale-95`}
@@ -147,7 +157,7 @@ export default function App() {
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6, delay: 0.3 }}
-            className="col-span-7 grid grid-rows-3 gap-3 overflow-y-auto"
+            className="col-span-7 grid  gap-3 overflow-y-auto"
           >
             <TimeLeftDisplay />
             <div className="glass rounded-xl p-3">

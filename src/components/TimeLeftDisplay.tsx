@@ -40,45 +40,30 @@ export default function TimeLeftDisplay() {
   const accentColor = getAccentColor();
 
   return (
-    <div className="glass rounded-xl p-2 flex flex-col items-center justify-center">
+    <div className="glass rounded-xl py-0 px-4 flex flex-col items-center justify-center h-[150px]">
       <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.5 }}
         className="text-center"
       >
-        <p className="text-sm text-gray-400 mb-2 tracking-wide">
+        <p className="text-[9px] text-gray-400 mb-0 tracking-wide">
           TIME LEFT TODAY
         </p>
         <div className="flex items-baseline justify-center gap-2">
-          <motion.span
-            key={timeLeft.hours}
-            initial={{ y: -20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            className={`text-6xl font-bold tabular-nums ${accentColor}`}
-          >
-            {String(timeLeft.hours).padStart(2, "0")}
-          </motion.span>
-          <span className="text-4xl text-gray-500">:</span>
-          <motion.span
-            key={timeLeft.minutes}
-            initial={{ y: -20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            className={`text-6xl font-bold tabular-nums ${accentColor}`}
-          >
+          <span className={`text-6xl font-bold tabular-nums ${accentColor}`}>
+            {timeLeft.hours}
+          </span>
+          <span className="text-5xl text-gray-500">:</span>
+          <span className={`text-6xl font-bold tabular-nums ${accentColor}`}>
             {String(timeLeft.minutes).padStart(2, "0")}
-          </motion.span>
-          <span className="text-4xl text-gray-500">:</span>
-          <motion.span
-            key={timeLeft.seconds}
-            initial={{ y: -20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            className={`text-6xl font-bold tabular-nums ${accentColor}`}
-          >
+          </span>
+          <span className="text-5xl text-gray-500">:</span>
+          <span className={`text-6xl font-bold tabular-nums ${accentColor}`}>
             {String(timeLeft.seconds).padStart(2, "0")}
-          </motion.span>
+          </span>
         </div>
-        <p className="text-xs text-gray-500 mt-3">Hours : Minutes : Seconds</p>
+        <p className="text-[8px] text-gray-500 mt-0 leading-none">Hours : Minutes : Seconds</p>
       </motion.div>
     </div>
   );
