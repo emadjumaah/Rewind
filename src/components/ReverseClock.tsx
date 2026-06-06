@@ -1,34 +1,16 @@
-import { useState, useEffect } from 'react'
-import { motion } from 'framer-motion'
 import { useStore } from '../store'
 
-export default function ReverseClock() {
-  const [time, setTime] = useState(new Date())
-  const [glowIntensity, setGlowIntensity] = useState(0.5)
+export default function ReverseClock({ currentTime }: { currentTime: Date }) {
   const { settings } = useStore()
 
-  useEffect(() => {
-    const timer = setInterval(() => setTime(new Date()), 100) // Reduced refresh rate for better performance
-    return () => clearInterval(timer)
-  }, [])
+  const seconds = currentTime.getSeconds()
+  const minutes = currentTime.getMinutes()
+  const hours = currentTime.getHours()
 
-  useEffect(() => {
-    // Breathing glow effect
-    const breathingInterval = setInterval(() => {
-      setGlowIntensity(0.3 + Math.sin(Date.now() / 1000) * 0.2)
-    }, 100)
-    return () => clearInterval(breathingInterval)
-  }, [])
-
-  const seconds = time.getSeconds()
-  const milliseconds = time.getMilliseconds()
-  const minutes = time.getMinutes()
-  const hours = time.getHours()
-
-  // Ultra-smooth hand movement with millisecond interpolation
-  const secondDeg = ((seconds + milliseconds / 1000) / 60) * 360
-  const minuteDeg = ((minutes + seconds / 60 + milliseconds / 60000) / 60) * 360
-  const hourDeg = ((hours % 12 + minutes / 60 + seconds / 3600) / 12) * 360
+  // Simple hand movement without millisecond interpolation for performance
+  const secondDeg = (seconds / 60) * 360
+  const minuteDeg = ((minutes + seconds / 60) / 60) * 360
+  const hourDeg = ((hours % 12 + minutes / 60) / 12) * 360
 
   const secondHandX = 100 + 75 * Math.sin((-secondDeg * Math.PI) / 180)
   const secondHandY = 100 - 75 * Math.cos((-secondDeg * Math.PI) / 180)
@@ -49,17 +31,6 @@ export default function ReverseClock() {
 
   const accentColor = getAccentColor()
 
-  const getMotionMultiplier = () => {
-    const multipliers = {
-      low: 2,
-      medium: 1,
-      high: 0.5,
-    }
-    return multipliers[settings.motionIntensity]
-  }
-
-  const motionMultiplier = getMotionMultiplier()
-
   const getNumberPosition = (num: number) => {
     const angle = ((12 - num) % 12 - 3) * (Math.PI / 6)
     const radius = 80
@@ -70,60 +41,14 @@ export default function ReverseClock() {
 
   return (
     <div className="relative w-full aspect-square">
-      {/* Ambient radial lighting */}
-      <motion.div
-        className="absolute inset-0 rounded-full"
-        animate={{
-          background: [
-            'radial-gradient(circle at 30% 30%, rgba(6, 182, 212, 0.08) 0%, transparent 50%)',
-            'radial-gradient(circle at 70% 70%, rgba(168, 85, 247, 0.08) 0%, transparent 50%)',
-            'radial-gradient(circle at 30% 30%, rgba(6, 182, 212, 0.08) 0%, transparent 50%)',
-          ],
-        }}
-        transition={{
-          duration: 10 * motionMultiplier,
-          repeat: Infinity,
-          ease: 'easeInOut',
-        }}
-        style={{ pointerEvents: 'none' }}
-      />
-
-      <motion.div
-        className="absolute inset-0 rounded-full"
-        animate={{
-          boxShadow: [
-            `0 0 ${30 + glowIntensity * 20}px ${10 + glowIntensity * 5}px ${accentColor} ${glowIntensity * 0.15})`,
-            `0 0 ${40 + glowIntensity * 25}px ${15 + glowIntensity * 8}px ${accentColor} ${glowIntensity * 0.1})`,
-            `0 0 ${30 + glowIntensity * 20}px ${10 + glowIntensity * 5}px ${accentColor} ${glowIntensity * 0.15})`,
-          ],
-        }}
-        transition={{
-          duration: 4 * motionMultiplier,
-          repeat: Infinity,
-          ease: 'easeInOut',
-        }}
-      />
+      {/* Ambient radial lighting - disabled for performance */}
 
       <svg className="w-full h-full" viewBox="0 0 200 200">
-        <defs>
-          <radialGradient id="clockGradient" cx="50%" cy="50%" r="50%">
-            <stop offset="0%" stopColor={`${accentColor} 0.1)`} />
-            <stop offset="100%" stopColor={`${accentColor} 0)`} />
-          </radialGradient>
-          <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
-            <feGaussianBlur stdDeviation="2" result="coloredBlur" />
-            <feMerge>
-              <feMergeNode in="coloredBlur" />
-              <feMergeNode in="SourceGraphic" />
-            </feMerge>
-          </filter>
-        </defs>
-
         <circle
           cx="100"
           cy="100"
           r="95"
-          fill="url(#clockGradient)"
+          fill="rgba(255,255,255,0.02)"
         />
 
         <circle
@@ -179,7 +104,7 @@ export default function ReverseClock() {
           }
         </div>
 
-        <motion.line
+        <line
           x1="100"
           y1="100"
           x2={secondHandX}
@@ -187,10 +112,9 @@ export default function ReverseClock() {
           stroke="rgba(255,255,255,0.9)"
           strokeWidth="2"
           strokeLinecap="round"
-          transition={{ type: "spring", stiffness: 300, damping: 30 }}
         />
 
-        <motion.line
+        <line
           x1="100"
           y1="100"
           x2={minuteHandX}
@@ -198,10 +122,9 @@ export default function ReverseClock() {
           stroke="rgba(255,255,255,0.7)"
           strokeWidth="3"
           strokeLinecap="round"
-          transition={{ type: "spring", stiffness: 200, damping: 25 }}
         />
 
-        <motion.line
+        <line
           x1="100"
           y1="100"
           x2={hourHandX}
@@ -209,7 +132,6 @@ export default function ReverseClock() {
           stroke="rgba(255,255,255,0.5)"
           strokeWidth="4"
           strokeLinecap="round"
-          transition={{ duration: 0.1, ease: "linear" }}
         />
       </svg>
     </div>

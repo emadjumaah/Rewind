@@ -1,27 +1,19 @@
 import { motion } from 'framer-motion'
-import { useState, useEffect } from 'react'
 import { differenceInWeeks, differenceInDays, endOfYear, endOfWeek, endOfDay, isWeekend } from 'date-fns'
 
-export default function TimeAnalytics() {
-  const [now, setNow] = useState(new Date())
+export default function TimeAnalytics({ currentTime }: { currentTime: Date }) {
+  const endOfDayDate = endOfDay(currentTime)
+  const endOfWeekDate = endOfWeek(currentTime)
+  const endOfYearDate = endOfYear(currentTime)
 
-  useEffect(() => {
-    const interval = setInterval(() => setNow(new Date()), 5000)
-    return () => clearInterval(interval)
-  }, [])
-
-  const endOfDayDate = endOfDay(now)
-  const endOfWeekDate = endOfWeek(now)
-  const endOfYearDate = endOfYear(now)
-
-  const msLeftToday = endOfDayDate.getTime() - now.getTime()
+  const msLeftToday = endOfDayDate.getTime() - currentTime.getTime()
   const hoursLeftToday = Math.floor(msLeftToday / (1000 * 60 * 60))
   const minsLeftToday = Math.floor((msLeftToday % (1000 * 60 * 60)) / (1000 * 60))
 
-  const weekendsLeft = differenceInWeeks(endOfYearDate, now) + (isWeekend(endOfYearDate) ? 1 : 0)
-  const yearProgress = ((now.getTime() - new Date(now.getFullYear(), 0, 1).getTime()) / (endOfYearDate.getTime() - new Date(now.getFullYear(), 0, 1).getTime())) * 100
+  const weekendsLeft = differenceInWeeks(endOfYearDate, currentTime) + (isWeekend(endOfYearDate) ? 1 : 0)
+  const yearProgress = ((currentTime.getTime() - new Date(currentTime.getFullYear(), 0, 1).getTime()) / (endOfYearDate.getTime() - new Date(currentTime.getFullYear(), 0, 1).getTime())) * 100
 
-  const workHoursLeftWeek = 40 - (differenceInDays(now, endOfWeekDate) * -8)
+  const workHoursLeftWeek = 40 - (differenceInDays(currentTime, endOfWeekDate) * -8)
 
   const analytics = [
     {
@@ -35,7 +27,7 @@ export default function TimeAnalytics() {
       progress: weekendsLeft / 52,
     },
     {
-      label: `${yearProgress.toFixed(0)}% of ${now.getFullYear()} gone`,
+      label: `${yearProgress.toFixed(0)}% of ${currentTime.getFullYear()} gone`,
       subtext: 'Quarter remaining: not enough.',
       progress: 1 - yearProgress / 100,
     },

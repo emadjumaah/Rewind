@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { useStore, Deadline } from "../store";
 import { differenceInDays, differenceInHours } from "date-fns";
@@ -32,10 +32,9 @@ function getUrgencyVibration(_deadline: Date): boolean {
   return false; // Disable vibration
 }
 
-function getUrgencyText(deadline: Date, estimatedHours: number): string {
-  const now = new Date();
-  const daysLeft = differenceInDays(deadline, now);
-  const hoursLeft = differenceInHours(deadline, now);
+function getUrgencyText(deadline: Date, estimatedHours: number, currentTime: Date): string {
+  const daysLeft = differenceInDays(deadline, currentTime);
+  const hoursLeft = differenceInHours(deadline, currentTime);
   const workHoursLeft = Math.max(0, hoursLeft - daysLeft * 16);
 
   if (hoursLeft < 24) {
@@ -54,27 +53,23 @@ function DeadlineCard({
   deadline,
   onRemove,
   onEdit,
+  currentTime,
 }: {
   deadline: Deadline;
   onRemove: (id: string) => void;
   onEdit: (deadline: Deadline) => void;
+  currentTime: Date;
 }) {
-  const [now, setNow] = useState(new Date());
   const deadlineDate =
     deadline.deadline instanceof Date
       ? deadline.deadline
       : new Date(deadline.deadline);
 
-  useEffect(() => {
-    const interval = setInterval(() => setNow(new Date()), 5000);
-    return () => clearInterval(interval);
-  }, []);
-
   const totalHours = differenceInHours(
     deadlineDate,
     new Date(deadlineDate.getTime() - 30 * 24 * 60 * 60 * 1000),
   );
-  const hoursLeft = differenceInHours(deadlineDate, now);
+  const hoursLeft = differenceInHours(deadlineDate, currentTime);
   const progress = Math.max(0, Math.min(1, hoursLeft / totalHours));
   const circumference = 2 * Math.PI * 45;
   const strokeDashoffset = circumference * (1 - progress);
@@ -199,7 +194,7 @@ function DeadlineCard({
           </svg>
           <div className="absolute inset-0 flex items-center justify-center">
             <span className="text-base font-semibold tabular-nums tracking-wide">
-              {differenceInDays(deadlineDate, now)}d
+              {differenceInDays(deadlineDate, currentTime)}d
             </span>
           </div>
         </div>
@@ -209,7 +204,7 @@ function DeadlineCard({
             {deadline.title}
           </h3>
           <p className="text-gray-400 text-xs leading-relaxed">
-            {getUrgencyText(deadlineDate, deadline.estimatedHours)}
+            {getUrgencyText(deadlineDate, deadline.estimatedHours, currentTime)}
           </p>
           <p className="text-gray-500 text-[10px] mt-1 tabular-nums">
             {deadlineDate.toLocaleDateString("en-US", {
@@ -233,7 +228,7 @@ function DeadlineCard({
   );
 }
 
-export default function DeadlineCards() {
+export default function DeadlineCards({ currentTime }: { currentTime: Date }) {
   const { deadlines, removeDeadline } = useStore();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingDeadline, setEditingDeadline] = useState<
@@ -269,6 +264,7 @@ export default function DeadlineCards() {
             deadline={deadline}
             onRemove={removeDeadline}
             onEdit={handleEdit}
+            currentTime={currentTime}
           />
         ))}
       </div>

@@ -122,17 +122,38 @@ const getContextualMessage = (deadlines: Deadline[], currentTime: Date): string 
     "You're not running out of time. You're wasting it.",
     "The clock is ticking. You're scrolling.",
     "You have 86,400 seconds today. How many have you wasted?",
+    "You're not busy. You're just avoiding what matters.",
+    "The deadline isn't moving closer. You're just standing still.",
+    "Productivity apps won't fix procrastination. Neither will this one.",
+    "You've had this tab open for 20 minutes. Still nothing done.",
+    "The to-do list grows. The motivation shrinks. Classic.",
+    "You're not overwhelmed. You're just not starting.",
+    "Time management is simple. You just won't do it.",
+    "The perfect moment doesn't exist. Start now. You won't.",
+    "You're reading this instead of working. We noticed.",
+    "The clock mocks you. You deserve it.",
+    "You have enough time. You just don't use it.",
+    "Motivation is a lie. Discipline is the truth. You have neither.",
+    "The day started without you. It might end that way too.",
+    "You're not taking a break. You're quitting.",
+    "Time is the one resource you can't renew. You're burning it.",
+    "The future you want requires the work you're avoiding.",
+    "You're not tired. You're bored with your own excuses.",
+    "Every second you waste is a second you'll never get back. Obvious.",
+    "The clock doesn't judge. It just counts. You should too.",
+    "You're not waiting for inspiration. You're procrastinating.",
+    "Time passes whether you use it or not. You're choosing not to.",
   ]
   return defaultMessages[Math.floor(Math.random() * defaultMessages.length)]
 }
 
-function ContextSentence() {
+function ContextSentence({ currentTime }: { currentTime: Date }) {
   const { deadlines } = useStore()
   const [context, setContext] = useState('')
 
   useEffect(() => {
     const updateContext = () => {
-      setContext(getContextualMessage(deadlines, new Date()))
+      setContext(getContextualMessage(deadlines, currentTime))
     }
 
     updateContext()

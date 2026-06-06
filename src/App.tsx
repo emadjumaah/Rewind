@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import ReverseClock from './components/ReverseClock'
 import ContextSentence from './components/ContextSentence'
@@ -16,6 +16,13 @@ export default function App() {
   const { settings, toggleFocusMode } = useStore()
   const [isSettingsOpen, setIsSettingsOpen] = useState(false)
   const [isAboutOpen, setIsAboutOpen] = useState(false)
+  const [currentTime, setCurrentTime] = useState(new Date())
+
+  // Centralized time update - single source of truth for all timers
+  useEffect(() => {
+    const interval = setInterval(() => setCurrentTime(new Date()), 1000)
+    return () => clearInterval(interval)
+  }, [])
 
   const toggleFullscreen = () => {
     if (!document.fullscreenElement) {
@@ -32,7 +39,7 @@ export default function App() {
       <div className={`fixed inset-0 ${settings.darkMode ? 'bg-gray-950' : 'bg-gray-100'} flex items-center justify-center p-4`}>
         <div className={`glass-strong rounded-2xl p-6 max-w-sm w-full ${settings.darkMode ? '' : 'bg-white/80'}`}>
           <div className="aspect-square max-h-[50vh] mx-auto mb-4">
-            <ReverseClock />
+            <ReverseClock currentTime={currentTime} />
           </div>
           <div className="text-center">
             <p className={`text-sm ${settings.darkMode ? 'text-gray-400' : 'text-gray-600'}`}>Widget Mode</p>
@@ -45,54 +52,16 @@ export default function App() {
 
   return (
     <div className={`h-screen w-screen ${themeClass} overflow-hidden p-3 relative`}>
-      {/* Ambient background system */}
+      {/* Ambient background system - disabled for performance */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
         <motion.div
           className="absolute inset-0 bg-gradient-to-br from-cyan-900/5 via-transparent to-purple-900/5"
-          animate={{
-            backgroundPosition: ['0% 0%', '100% 100%', '0% 0%'],
-          }}
-          transition={{
-            duration: 60,
-            repeat: Infinity,
-            ease: 'linear',
-          }}
           style={{ backgroundSize: '200% 200%' }}
         />
         <motion.div
           className="absolute inset-0 bg-gradient-to-tl from-amber-900/3 via-transparent to-cyan-900/3"
-          animate={{
-            backgroundPosition: ['100% 100%', '0% 0%', '100% 100%'],
-          }}
-          transition={{
-            duration: 70,
-            repeat: Infinity,
-            ease: 'linear',
-          }}
           style={{ backgroundSize: '300% 300%' }}
         />
-        {/* Floating particles - reduced for performance */}
-        {[...Array(5)].map((_, i) => (
-          <motion.div
-            key={i}
-            className="absolute w-0.5 h-0.5 bg-cyan-500/20 rounded-full"
-            initial={{
-              x: Math.random() * 100 + '%',
-              y: Math.random() * 100 + '%',
-              opacity: 0,
-            }}
-            animate={{
-              y: [null, Math.random() * 100 + '%'],
-              opacity: [0, 0.4, 0],
-            }}
-            transition={{
-              duration: 20 + Math.random() * 30,
-              repeat: Infinity,
-              ease: 'easeInOut',
-              delay: Math.random() * 10,
-            }}
-          />
-        ))}
       </div>
 
       <FocusMode />
@@ -101,12 +70,7 @@ export default function App() {
       <About isOpen={isAboutOpen} onClose={() => setIsAboutOpen(false)} />
 
       <div className="h-full flex flex-col gap-2 relative z-10">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="text-center flex items-center justify-between px-4"
-        >
+        <div className="text-center flex items-center justify-between px-4">
           <h1 className={`text-2xl font-light tracking-tight ${settings.darkMode ? 'text-gray-100' : 'text-gray-900'}`}>Rewind</h1>
           <div className="flex gap-2">
             <button
@@ -138,36 +102,26 @@ export default function App() {
               <SettingsIcon size={20} />
             </button>
           </div>
-        </motion.div>
+        </div>
 
         <div className="flex-1 grid grid-cols-12 gap-3 min-h-0">
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="col-span-5 flex flex-col gap-3"
-          >
+          <div className="col-span-5 flex flex-col gap-3">
             <div className="glass-strong rounded-xl p-4 flex-1 flex items-center justify-center">
-              <ReverseClock />
+              <ReverseClock currentTime={currentTime} />
             </div>
-            <ContextSentence />
-          </motion.div>
+            <ContextSentence currentTime={currentTime} />
+          </div>
 
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.6, delay: 0.3 }}
-            className="col-span-7 grid  gap-3 overflow-y-auto"
-          >
-            <TimeLeftDisplay />
+          <div className="col-span-7 grid  gap-3 overflow-y-auto">
+            <TimeLeftDisplay currentTime={currentTime} />
             <div className="glass rounded-xl p-3">
-              <DeadlineCards />
+              <DeadlineCards currentTime={currentTime} />
             </div>
 
             <div className="glass rounded-xl p-3">
-              <TimeAnalytics />
+              <TimeAnalytics currentTime={currentTime} />
             </div>
-          </motion.div>
+          </div>
         </div>
       </div>
     </div>
