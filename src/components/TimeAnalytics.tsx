@@ -40,21 +40,21 @@ export default function TimeAnalytics() {
   ]
 
   return (
-    <div className="space-y-4">
-      <h2 className="text-2xl font-semibold text-gray-200">Time Remaining</h2>
-      <div className="space-y-3">
+    <div className="space-y-2">
+      <h2 className="text-lg font-semibold text-gray-200">Time Remaining</h2>
+      <div className="space-y-2">
         {analytics.map((item, index) => (
           <motion.div
             key={index}
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: index * 0.1 }}
-            className="glass rounded-xl p-4"
+            className="glass rounded-lg p-2"
           >
-            <div className="flex justify-between items-center mb-2">
-              <span className="text-gray-200 font-medium">{item.label}</span>
+            <div className="flex justify-between items-center mb-1">
+              <span className="text-gray-200 text-xs font-medium">{item.label}</span>
             </div>
-            <div className="h-2 bg-white/10 rounded-full overflow-hidden mb-2">
+            <div className="h-1.5 bg-white/10 rounded-full overflow-hidden mb-1">
               <motion.div
                 initial={{ width: 0 }}
                 animate={{ width: `${item.progress * 100}%` }}
@@ -62,7 +62,7 @@ export default function TimeAnalytics() {
                 className="h-full bg-gradient-to-r from-cyan-500/50 to-cyan-400/50 rounded-full"
               />
             </div>
-            <p className="text-gray-500 text-sm">{item.subtext}</p>
+            <p className="text-gray-500 text-[10px]">{item.subtext}</p>
           </motion.div>
         ))}
       </div>

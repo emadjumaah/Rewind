@@ -42,18 +42,18 @@ function DeadlineCard({ deadline, onRemove }: { deadline: Deadline; onRemove: (i
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className={`glass rounded-2xl p-6 relative ${getUrgencyColor(deadlineDate)}`}
+      className={`glass rounded-xl p-3 relative ${getUrgencyColor(deadlineDate)}`}
     >
       <button
         onClick={() => onRemove(deadline.id)}
-        className="absolute top-4 right-4 text-gray-500 hover:text-gray-300 transition-colors"
+        className="absolute top-2 right-2 text-gray-500 hover:text-gray-300 transition-colors"
       >
         <X size={16} />
       </button>
 
-      <div className="flex items-start gap-4">
+      <div className="flex items-start gap-3">
         <div className="relative">
-          <svg className="w-24 h-24" viewBox="0 0 100 100">
+          <svg className="w-16 h-16" viewBox="0 0 100 100">
             <circle
               cx="50"
               cy="50"
@@ -78,18 +78,18 @@ function DeadlineCard({ deadline, onRemove }: { deadline: Deadline; onRemove: (i
             />
           </svg>
           <div className="absolute inset-0 flex items-center justify-center">
-            <span className="text-lg font-semibold">
+            <span className="text-sm font-semibold">
               {differenceInDays(deadlineDate, now)}d
             </span>
           </div>
         </div>
 
         <div className="flex-1">
-          <h3 className="text-xl font-semibold mb-2">{deadline.title}</h3>
-          <p className="text-gray-400 text-sm leading-relaxed">
+          <h3 className="text-base font-semibold mb-1">{deadline.title}</h3>
+          <p className="text-gray-400 text-xs leading-relaxed">
             {getUrgencyText(deadlineDate, deadline.estimatedHours)}
           </p>
-          <p className="text-gray-500 text-xs mt-2">
+          <p className="text-gray-500 text-[10px] mt-1">
             {deadlineDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
           </p>
         </div>
@@ -102,9 +102,9 @@ export default function DeadlineCards() {
   const { deadlines, removeDeadline } = useStore()
 
   return (
-    <div className="space-y-4">
-      <h2 className="text-2xl font-semibold text-gray-200">Deadlines</h2>
-      <div className="grid gap-4">
+    <div className="space-y-2">
+      <h2 className="text-lg font-semibold text-gray-200">Deadlines</h2>
+      <div className="grid gap-2">
         {deadlines.map((deadline) => (
           <DeadlineCard key={deadline.id} deadline={deadline} onRemove={removeDeadline} />
         ))}
