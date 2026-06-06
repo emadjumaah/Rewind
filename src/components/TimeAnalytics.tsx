@@ -39,7 +39,13 @@ export default function TimeAnalytics() {
     },
   ]
 
-  const getBarColor = (progress: number) => {
+  const getRingColor = (progress: number) => {
+    if (progress > 0.6) return 'rgba(6, 182, 212, 0.8)'
+    if (progress > 0.3) return 'rgba(245, 158, 11, 0.8)'
+    return 'rgba(239, 68, 68, 0.8)'
+  }
+
+  const getGradientColor = (progress: number) => {
     if (progress > 0.6) return 'from-cyan-500/50 to-cyan-400/50'
     if (progress > 0.3) return 'from-amber-500/50 to-amber-400/50'
     return 'from-red-500/50 to-red-400/50'
@@ -48,29 +54,70 @@ export default function TimeAnalytics() {
   return (
     <div className="space-y-2">
       <h2 className="text-lg font-semibold text-gray-200">Time Remaining</h2>
-      <div className="space-y-2">
-        {analytics.map((item, index) => (
-          <motion.div
-            key={index}
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: index * 0.1 }}
-            className="glass rounded-lg p-2"
-          >
-            <div className="flex justify-between items-center mb-1">
-              <span className="text-gray-200 text-xs font-medium">{item.label}</span>
-            </div>
-            <div className="h-1.5 bg-white/5 rounded-full overflow-hidden mb-1">
-              <motion.div
-                initial={{ width: '100%' }}
-                animate={{ width: `${item.progress * 100}%` }}
-                transition={{ duration: 1, delay: index * 0.1 }}
-                className={`h-full bg-gradient-to-r ${getBarColor(item.progress)} rounded-full`}
-              />
-            </div>
-            <p className="text-gray-500 text-[10px]">{item.subtext}</p>
-          </motion.div>
-        ))}
+      <div className="grid grid-cols-2 gap-2">
+        {analytics.map((item, index) => {
+          const circumference = 2 * Math.PI * 28
+          const strokeDashoffset = circumference * (1 - item.progress)
+          const ringColor = getRingColor(item.progress)
+
+          return (
+            <motion.div
+              key={index}
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: index * 0.1 }}
+              className="glass rounded-lg p-3 flex flex-col items-center"
+            >
+              <div className="relative mb-2">
+                <svg className="w-16 h-16" viewBox="0 0 60 60">
+                  <defs>
+                    <radialGradient id={`analyticsGradient-${index}`} cx="50%" cy="50%" r="50%">
+                      <stop offset="0%" stopColor={ringColor} stopOpacity="0.2" />
+                      <stop offset="100%" stopColor={ringColor} stopOpacity="0" />
+                    </radialGradient>
+                  </defs>
+                  <circle
+                    cx="30"
+                    cy="30"
+                    r="28"
+                    fill={`url(#analyticsGradient-${index})`}
+                  />
+                  <circle
+                    cx="30"
+                    cy="30"
+                    r="28"
+                    fill="none"
+                    stroke="rgba(255,255,255,0.05)"
+                    strokeWidth="3"
+                  />
+                  <motion.circle
+                    cx="30"
+                    cy="30"
+                    r="28"
+                    fill="none"
+                    stroke={ringColor}
+                    strokeWidth="3"
+                    strokeLinecap="round"
+                    strokeDasharray={circumference}
+                    initial={{ strokeDashoffset: circumference }}
+                    animate={{ strokeDashoffset }}
+                    transition={{ duration: 1, delay: index * 0.1 }}
+                    style={{ transform: 'rotate(-90deg)', transformOrigin: '30px 30px' }}
+                  />
+                </svg>
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <span className="text-xs font-semibold tabular-nums">
+                    {Math.round(item.progress * 100)}%
+                  </span>
+                </div>
+              </div>
+              <span className="text-gray-200 text-xs font-medium tracking-tight text-center leading-tight">
+                {item.label}
+              </span>
+              <p className="text-gray-500 text-[10px] text-center mt-1">{item.subtext}</p>
+            </motion.div>
+          )
+        })}
       </div>
     </div>
   )

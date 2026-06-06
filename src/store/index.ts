@@ -13,6 +13,8 @@ export interface Settings {
   motionIntensity: 'low' | 'medium' | 'high'
   timeFormat: '12h' | '24h'
   focusSessionLength: number
+  widgetMode: boolean
+  darkMode: boolean
 }
 
 interface AppState {
@@ -26,6 +28,7 @@ interface AppState {
   updateSettings: (settings: Partial<Settings>) => void
   toggleFocusMode: () => void
   setCommandPaletteOpen: (open: boolean) => void
+  toggleWidgetMode: () => void
 }
 
 const demoDeadlines: Deadline[] = [
@@ -58,6 +61,8 @@ export const useStore = create<AppState>()(
         motionIntensity: 'medium',
         timeFormat: '24h',
         focusSessionLength: 90,
+        widgetMode: false,
+        darkMode: true,
       },
       isFocusMode: false,
       isCommandPaletteOpen: false,
@@ -81,6 +86,7 @@ export const useStore = create<AppState>()(
         })),
       toggleFocusMode: () => set((state) => ({ isFocusMode: !state.isFocusMode })),
       setCommandPaletteOpen: (open) => set({ isCommandPaletteOpen: open }),
+      toggleWidgetMode: () => set((state) => ({ settings: { ...state.settings, widgetMode: !state.settings.widgetMode } })),
     }),
     {
       name: 'rewind-storage-v2',

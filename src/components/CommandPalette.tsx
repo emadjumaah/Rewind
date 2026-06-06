@@ -1,10 +1,19 @@
 import { useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useStore } from '../store'
-import { X, Clock, Settings as SettingsIcon, Plus } from 'lucide-react'
+import { X, Clock, Settings as SettingsIcon, Plus, Trash2, RotateCcw, Moon, Sun, Monitor } from 'lucide-react'
 
 export default function CommandPalette() {
-  const { isCommandPaletteOpen, setCommandPaletteOpen, toggleFocusMode } = useStore()
+  const {
+    isCommandPaletteOpen,
+    setCommandPaletteOpen,
+    toggleFocusMode,
+    deadlines,
+    removeDeadline,
+    settings,
+    updateSettings,
+    toggleWidgetMode
+  } = useStore()
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -46,6 +55,43 @@ export default function CommandPalette() {
       },
       shortcut: '⌘S',
     },
+    {
+      icon: <Trash2 size={18} />,
+      label: 'Clear All Deadlines',
+      action: () => {
+        deadlines.forEach(d => removeDeadline(d.id))
+        setCommandPaletteOpen(false)
+      },
+      shortcut: '⌘⌫',
+      destructive: true,
+    },
+    {
+      icon: <RotateCcw size={18} />,
+      label: 'Reset Settings',
+      action: () => {
+        updateSettings({ focusSessionLength: 25 })
+        setCommandPaletteOpen(false)
+      },
+      shortcut: '⌘R',
+    },
+    {
+      icon: settings.darkMode ? <Sun size={18} /> : <Moon size={18} />,
+      label: settings.darkMode ? 'Light Mode' : 'Dark Mode',
+      action: () => {
+        updateSettings({ darkMode: !settings.darkMode })
+        setCommandPaletteOpen(false)
+      },
+      shortcut: '⌘L',
+    },
+    {
+      icon: <Monitor size={18} />,
+      label: settings.widgetMode ? 'Exit Widget Mode' : 'Widget Mode',
+      action: () => {
+        toggleWidgetMode()
+        setCommandPaletteOpen(false)
+      },
+      shortcut: '⌘W',
+    },
   ]
 
   if (!isCommandPaletteOpen) return null
@@ -83,10 +129,12 @@ export default function CommandPalette() {
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: index * 0.05 }}
                 onClick={command.action}
-                className="w-full flex items-center gap-4 p-3 rounded-xl hover:bg-white/10 transition-colors text-left"
+                className={`w-full flex items-center gap-4 p-3 rounded-xl hover:bg-white/10 transition-colors text-left ${
+                  command.destructive ? 'hover:bg-red-500/20' : ''
+                }`}
               >
-                <span className="text-gray-400">{command.icon}</span>
-                <span className="flex-1 text-gray-200">{command.label}</span>
+                <span className={command.destructive ? 'text-red-400' : 'text-gray-400'}>{command.icon}</span>
+                <span className={`flex-1 ${command.destructive ? 'text-red-300' : 'text-gray-200'}`}>{command.label}</span>
                 <span className="text-gray-500 text-xs">{command.shortcut}</span>
               </motion.button>
             ))}
