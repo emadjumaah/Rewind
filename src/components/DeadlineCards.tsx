@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useStore, Deadline } from "../store";
 import { differenceInDays, differenceInHours } from "date-fns";
@@ -59,11 +59,17 @@ function DeadlineCard({
   onRemove: (id: string) => void;
   onEdit: (deadline: Deadline) => void;
 }) {
-  const now = new Date();
+  const [now, setNow] = useState(new Date());
   const deadlineDate =
     deadline.deadline instanceof Date
       ? deadline.deadline
       : new Date(deadline.deadline);
+
+  useEffect(() => {
+    const interval = setInterval(() => setNow(new Date()), 1000);
+    return () => clearInterval(interval);
+  }, []);
+
   const totalHours = differenceInHours(
     deadlineDate,
     new Date(deadlineDate.getTime() - 30 * 24 * 60 * 60 * 1000),

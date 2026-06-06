@@ -1,8 +1,15 @@
 import { motion } from 'framer-motion'
+import { useState, useEffect } from 'react'
 import { differenceInWeeks, differenceInDays, endOfYear, endOfWeek, endOfDay, isWeekend } from 'date-fns'
 
 export default function TimeAnalytics() {
-  const now = new Date()
+  const [now, setNow] = useState(new Date())
+
+  useEffect(() => {
+    const interval = setInterval(() => setNow(new Date()), 1000)
+    return () => clearInterval(interval)
+  }, [])
+
   const endOfDayDate = endOfDay(now)
   const endOfWeekDate = endOfWeek(now)
   const endOfYearDate = endOfYear(now)
