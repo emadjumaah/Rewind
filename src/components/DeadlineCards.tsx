@@ -53,7 +53,7 @@ function DeadlineCard({ deadline, onRemove }: { deadline: Deadline; onRemove: (i
 
       <div className="flex items-start gap-3">
         <div className="relative">
-          <svg className="w-16 h-16" viewBox="0 0 100 100">
+          <svg className="w-20 h-20" viewBox="0 0 100 100">
             <circle
               cx="50"
               cy="50"
@@ -78,7 +78,7 @@ function DeadlineCard({ deadline, onRemove }: { deadline: Deadline; onRemove: (i
             />
           </svg>
           <div className="absolute inset-0 flex items-center justify-center">
-            <span className="text-sm font-semibold">
+            <span className="text-base font-semibold">
               {differenceInDays(deadlineDate, now)}d
             </span>
           </div>

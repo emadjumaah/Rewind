@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion'
 import ReverseClock from './components/ReverseClock'
+import ContextSentence from './components/ContextSentence'
 import DeadlineCards from './components/DeadlineCards'
 import TimeAnalytics from './components/TimeAnalytics'
 import FocusMode from './components/FocusMode'
@@ -28,11 +29,12 @@ export default function App() {
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="col-span-5"
+            className="col-span-5 flex flex-col gap-3"
           >
-            <div className="glass-strong rounded-xl p-4 h-full flex items-center justify-center">
+            <div className="glass-strong rounded-xl p-4 flex-1 flex items-center justify-center">
               <ReverseClock />
             </div>
+            <ContextSentence />
           </motion.div>
 
           <motion.div
