@@ -156,7 +156,7 @@ export default function ReverseClock() {
   const hourHandY = 100 - 50 * Math.cos((-hourDeg * Math.PI) / 180)
 
   const getNumberPosition = (num: number) => {
-    const angle = (12 - num + 3) * (Math.PI / 6)
+    const angle = ((12 - num) % 12 - 3) * (Math.PI / 6)
     const radius = 80
     const x = 100 + radius * Math.cos(angle)
     const y = 100 + radius * Math.sin(angle)
@@ -193,9 +193,9 @@ export default function ReverseClock() {
               y={y}
               textAnchor="middle"
               dominantBaseline="middle"
-              fill="rgba(255,255,255,0.4)"
-              fontSize="12"
-              fontWeight="500"
+              fill="rgba(255,255,255,0.6)"
+              fontSize="16"
+              fontWeight="600"
             >
               {num}
             </text>

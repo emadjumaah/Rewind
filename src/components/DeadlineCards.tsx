@@ -5,10 +5,16 @@ import { X } from 'lucide-react'
 
 function getUrgencyColor(deadline: Date): string {
   const hoursLeft = differenceInHours(deadline, new Date())
-  if (hoursLeft < 24) return 'border-red-500/50 shadow-red-500/20'
-  if (hoursLeft < 72) return 'border-amber-500/50 shadow-amber-500/20'
-  if (hoursLeft < 168) return 'border-blue-500/50 shadow-blue-500/20'
-  return 'border-cyan-500/50 shadow-cyan-500/20'
+  if (hoursLeft < 24) return 'border-red-500/50 shadow-red-500/20 bg-red-500/5'
+  if (hoursLeft < 72) return 'border-amber-500/50 shadow-amber-500/20 bg-amber-500/5'
+  if (hoursLeft < 168) return 'border-blue-500/50 shadow-blue-500/20 bg-blue-500/5'
+  return 'border-cyan-500/50 shadow-cyan-500/20 bg-cyan-500/5'
+}
+
+function getUrgencyPulse(deadline: Date): string {
+  const hoursLeft = differenceInHours(deadline, new Date())
+  if (hoursLeft < 24) return 'animate-pulse'
+  return ''
 }
 
 function getUrgencyText(deadline: Date, estimatedHours: number): string {
@@ -42,7 +48,7 @@ function DeadlineCard({ deadline, onRemove }: { deadline: Deadline; onRemove: (i
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className={`glass rounded-xl p-3 relative ${getUrgencyColor(deadlineDate)}`}
+      className={`glass rounded-xl p-3 relative ${getUrgencyColor(deadlineDate)} ${getUrgencyPulse(deadlineDate)}`}
     >
       <button
         onClick={() => onRemove(deadline.id)}

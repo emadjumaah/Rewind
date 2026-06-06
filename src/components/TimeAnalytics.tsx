@@ -54,7 +54,7 @@ export default function TimeAnalytics() {
             <div className="flex justify-between items-center mb-1">
               <span className="text-gray-200 text-xs font-medium">{item.label}</span>
             </div>
-            <div className="h-1.5 bg-white/10 rounded-full overflow-hidden mb-1 flex justify-end">
+            <div className="h-1.5 bg-white/5 rounded-full overflow-hidden mb-1">
               <motion.div
                 initial={{ width: 0 }}
                 animate={{ width: `${item.progress * 100}%` }}
