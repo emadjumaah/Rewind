@@ -39,6 +39,12 @@ export default function TimeAnalytics() {
     },
   ]
 
+  const getBarColor = (progress: number) => {
+    if (progress > 0.6) return 'from-cyan-500/50 to-cyan-400/50'
+    if (progress > 0.3) return 'from-amber-500/50 to-amber-400/50'
+    return 'from-red-500/50 to-red-400/50'
+  }
+
   return (
     <div className="space-y-2">
       <h2 className="text-lg font-semibold text-gray-200">Time Remaining</h2>
@@ -56,10 +62,10 @@ export default function TimeAnalytics() {
             </div>
             <div className="h-1.5 bg-white/5 rounded-full overflow-hidden mb-1">
               <motion.div
-                initial={{ width: 0 }}
+                initial={{ width: '100%' }}
                 animate={{ width: `${item.progress * 100}%` }}
                 transition={{ duration: 1, delay: index * 0.1 }}
-                className="h-full bg-gradient-to-r from-cyan-500/50 to-cyan-400/50 rounded-full"
+                className={`h-full bg-gradient-to-r ${getBarColor(item.progress)} rounded-full`}
               />
             </div>
             <p className="text-gray-500 text-[10px]">{item.subtext}</p>
