@@ -4,41 +4,66 @@
 
 @layer base {
   body {
-    @apply bg-gray-950 text-gray-100 antialiased;
+    @apply antialiased;
     font-family: 'Space Grotesk', sans-serif;
+    background-color: #f9fafb; /* gray-50 */
+    color: #111827;            /* gray-900 */
+  }
+
+  html.dark body {
+    background-color: #030712; /* gray-950 */
+    color: #f3f4f6;            /* gray-100 */
   }
 
   h1, h2, h3, h4, h5, h6 {
     @apply font-semibold tracking-tight;
   }
-
-  .font-mono {
-    font-family: 'Space Grotesk', monospace;
-  }
 }
 
 @layer utilities {
+  /* ── Glass surface ── */
   .glass {
-    @apply bg-white/5 border border-white/10 shadow-xl;
+    background: rgba(0, 0, 0, 0.04);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    @apply shadow-lg backdrop-blur-sm;
   }
-
   .glass-strong {
-    @apply bg-white/10 border border-white/15 shadow-2xl;
+    background: rgba(255, 255, 255, 0.78);
+    border: 1px solid rgba(0, 0, 0, 0.11);
+    @apply shadow-2xl backdrop-blur-md;
   }
 
-  .text-display {
-    @apply text-6xl font-bold tracking-tight leading-none;
+  html.dark .glass {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.1);
+  }
+  html.dark .glass-strong {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.15);
   }
 
-  .text-huge {
-    @apply text-5xl font-bold tracking-tight leading-none;
-  }
+  /* ── Text helpers ── */
+  .text-display { @apply text-6xl font-bold tracking-tight leading-none; }
+  .text-huge    { @apply text-5xl font-bold tracking-tight leading-none; }
+  .text-large   { @apply text-3xl font-semibold tracking-tight leading-tight; }
+  .text-number  { font-family: 'Space Grotesk', monospace; @apply font-medium tabular-nums tracking-wide; }
+}
 
-  .text-large {
-    @apply text-3xl font-semibold tracking-tight leading-tight;
-  }
+/*
+  Light-mode gray remap — components use dark-friendly gray utilities
+  (text-gray-100 / 200 / 400 / 500) that are invisible on a light background.
+  These selectors override them globally without touching each component.
+  Specificity: [0,1,1] beats Tailwind utility [0,1,0] — no !important needed.
+*/
+html:not(.dark) .text-gray-100 { color: #111827; } /* gray-900 */
+html:not(.dark) .text-gray-200 { color: #1f2937; } /* gray-800 */
+html:not(.dark) .text-gray-300 { color: #374151; } /* gray-700 */
+html:not(.dark) .text-gray-400 { color: #4b5563; } /* gray-600 */
+html:not(.dark) .text-gray-500 { color: #6b7280; } /* gray-500 — stays legible */
 
-  .text-number {
-    @apply font-mono font-medium tabular-nums tracking-wide;
-  }
+/* Input / select backgrounds in light mode */
+html:not(.dark) input,
+html:not(.dark) select,
+html:not(.dark) textarea {
+  color-scheme: light;
 }

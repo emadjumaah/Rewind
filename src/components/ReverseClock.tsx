@@ -1,138 +1,123 @@
 import { useStore } from '../store'
 
+const ACCENT_HEX: Record<string, string> = {
+  cyan:   '#06b6d4',
+  purple: '#a855f7',
+  amber:  '#f59e0b',
+  red:    '#ef4444',
+}
+
 export default function ReverseClock({ currentTime }: { currentTime: Date }) {
   const { settings } = useStore()
 
-  const seconds = currentTime.getSeconds()
-  const minutes = currentTime.getMinutes()
-  const hours = currentTime.getHours()
+  const isDark = settings.darkMode
+  const accent = ACCENT_HEX[settings.accentColor]
 
-  // Simple hand movement without millisecond interpolation for performance
-  const secondDeg = (seconds / 60) * 360
-  const minuteDeg = ((minutes + seconds / 60) / 60) * 360
-  const hourDeg = ((hours % 12 + minutes / 60) / 12) * 360
+  const sec = currentTime.getSeconds()
+  const min = currentTime.getMinutes()
+  const hr  = currentTime.getHours()
 
-  const secondHandX = 100 + 75 * Math.sin((-secondDeg * Math.PI) / 180)
-  const secondHandY = 100 - 75 * Math.cos((-secondDeg * Math.PI) / 180)
-  const minuteHandX = 100 + 65 * Math.sin((-minuteDeg * Math.PI) / 180)
-  const minuteHandY = 100 - 65 * Math.cos((-minuteDeg * Math.PI) / 180)
-  const hourHandX = 100 + 50 * Math.sin((-hourDeg * Math.PI) / 180)
-  const hourHandY = 100 - 50 * Math.cos((-hourDeg * Math.PI) / 180)
+  // Counter-clockwise angles (negative = CCW from 12 o'clock)
+  // 1-second ticks — smooth enough for a clock, no re-render overhead
+  const secDeg  = -(sec / 60) * 360
+  const minDeg  = -((min + sec / 60)  / 60) * 360
+  const hourDeg = -((hr % 12 + min / 60) / 12) * 360
 
-  const getAccentColor = () => {
-    const colors = {
-      cyan: 'rgba(6, 182, 212,',
-      purple: 'rgba(168, 85, 247,',
-      amber: 'rgba(245, 158, 11,',
-      red: 'rgba(239, 68, 68,',
-    }
-    return colors[settings.accentColor]
+  // SVG coordinate helpers
+  const cx = 100
+  const R  = 88  // outer tick radius
+
+  function tip(angleDeg: number, len: number): { x: number; y: number } {
+    const rad = (angleDeg - 90) * (Math.PI / 180)
+    return { x: cx + len * Math.cos(rad), y: cx + len * Math.sin(rad) }
   }
 
-  const accentColor = getAccentColor()
+  const sec4  = tip(secDeg,  R * 0.88)
+  const min4  = tip(minDeg,  R * 0.76)
+  const hour4 = tip(hourDeg, R * 0.56)
 
-  const getNumberPosition = (num: number) => {
-    const angle = ((12 - num) % 12 - 3) * (Math.PI / 6)
-    const radius = 80
-    const x = 100 + radius * Math.cos(angle)
-    const y = 100 + radius * Math.sin(angle)
-    return { x, y }
-  }
+  // Theme colours
+  const faceStroke = isDark ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.14)'
+  const faceFill   = isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)'
+  const tickMajor  = isDark ? 'rgba(255,255,255,0.42)' : 'rgba(0,0,0,0.38)'
+  const tickMinor  = isDark ? 'rgba(255,255,255,0.14)' : 'rgba(0,0,0,0.12)'
+  const numFill    = isDark ? 'rgba(255,255,255,0.60)' : 'rgba(0,0,0,0.52)'
+  const handHour   = isDark ? 'rgba(255,255,255,0.78)' : 'rgba(0,0,0,0.70)'
+  const handMin    = isDark ? 'rgba(255,255,255,0.90)' : 'rgba(0,0,0,0.84)'
+  const centerFill = isDark ? '#060610'                : '#f5f5f0'
+  const labelFill  = isDark ? 'rgba(255,255,255,0.20)' : 'rgba(0,0,0,0.18)'
+
+  // Mirrored labels: clockwise positions (i×30°), counter-clockwise numbers
+  // 12 at top → as you go clockwise you see 11, 10, 9 … 1
+  const LABELS = [12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1]
+  const labelR = R - 22
 
   return (
-    <div className="relative w-full aspect-square">
-      {/* Ambient radial lighting - disabled for performance */}
-
+    <div className="relative w-full aspect-square select-none">
       <svg className="w-full h-full" viewBox="0 0 200 200">
-        <circle
-          cx="100"
-          cy="100"
-          r="95"
-          fill="rgba(255,255,255,0.02)"
-        />
 
-        <circle
-          cx="100"
-          cy="100"
-          r="95"
-          fill="none"
-          stroke="rgba(255,255,255,0.1)"
-          strokeWidth="2"
-        />
-        <circle
-          cx="100"
-          cy="100"
-          r="90"
-          fill="none"
-          stroke="rgba(255,255,255,0.05)"
-          strokeWidth="1"
-        />
+        {/* Outer ring + subtle inner ring */}
+        <circle cx={cx} cy={cx} r={R + 2}  fill={faceFill} stroke={faceStroke} strokeWidth="1.5" />
+        <circle cx={cx} cy={cx} r={R - 8}  fill="none"     stroke={faceStroke} strokeWidth="0.5" strokeOpacity="0.35" />
 
-        {Array.from({ length: 12 }, (_, i) => {
-          const num = i + 1
-          const { x, y } = getNumberPosition(num)
+        {/* 60 tick marks */}
+        {Array.from({ length: 60 }, (_, i) => {
+          const a = (i * 6 - 90) * (Math.PI / 180)
+          const major = i % 5 === 0
+          const r1 = major ? R - 13 : R - 6
           return (
-            <text
-              key={num}
-              x={x}
-              y={y}
+            <line key={i}
+              x1={cx + r1 * Math.cos(a)} y1={cx + r1 * Math.sin(a)}
+              x2={cx + R  * Math.cos(a)} y2={cx + R  * Math.sin(a)}
+              stroke={major ? tickMajor : tickMinor}
+              strokeWidth={major ? 1.6 : 0.8}
+            />
+          )
+        })}
+
+        {/* Mirrored hour labels */}
+        {LABELS.map((num, i) => {
+          const a = (i * 30 - 90) * (Math.PI / 180)
+          return (
+            <text key={num}
+              x={cx + labelR * Math.cos(a)}
+              y={cx + labelR * Math.sin(a)}
               textAnchor="middle"
-              dominantBaseline="middle"
-              fill="rgba(255,255,255,0.8)"
-              fontSize="20"
-              fontWeight="600"
-              letterSpacing="0.5"
-              fontFamily="'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace"
+              dominantBaseline="central"
+              fontSize="11.5"
+              fontWeight="500"
+              fontFamily="'SF Mono', Monaco, Inconsolata, 'Courier New', monospace"
+              fill={numFill}
             >
               {num}
             </text>
           )
         })}
 
-        <circle
-          cx="100"
-          cy="100"
-          r="4"
-          fill="rgba(255,255,255,0.8)"
-        />
+        {/* Hour hand */}
+        <line x1={cx} y1={cx} x2={hour4.x} y2={hour4.y}
+          stroke={handHour} strokeWidth="4.5" strokeLinecap="round" />
 
-        {/* Backward digital clock overlay */}
-        <div className="absolute top-6 left-1/2 -translate-x-1/2 text-sm font-mono tabular-nums tracking-widest" style={{ transform: 'scaleX(-1)', color: `${accentColor} 0.7)` }}>
-          {settings.timeFormat === '12h'
-            ? `${hours % 12 || 12}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`
-            : `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`
-          }
-        </div>
+        {/* Minute hand */}
+        <line x1={cx} y1={cx} x2={min4.x} y2={min4.y}
+          stroke={handMin} strokeWidth="2.5" strokeLinecap="round" />
 
-        <line
-          x1="100"
-          y1="100"
-          x2={secondHandX}
-          y2={secondHandY}
-          stroke="rgba(255,255,255,0.9)"
-          strokeWidth="2"
-          strokeLinecap="round"
-        />
+        {/* Second hand — smooth via rAF */}
+        <line x1={cx} y1={cx} x2={sec4.x} y2={sec4.y}
+          stroke={accent} strokeWidth="1.6" strokeLinecap="round" />
 
-        <line
-          x1="100"
-          y1="100"
-          x2={minuteHandX}
-          y2={minuteHandY}
-          stroke="rgba(255,255,255,0.7)"
-          strokeWidth="3"
-          strokeLinecap="round"
-        />
+        {/* Centre cap */}
+        <circle cx={cx} cy={cx} r={5.5} fill={accent} />
+        <circle cx={cx} cy={cx} r={2.5} fill={centerFill} />
 
-        <line
-          x1="100"
-          y1="100"
-          x2={hourHandX}
-          y2={hourHandY}
-          stroke="rgba(255,255,255,0.5)"
-          strokeWidth="4"
-          strokeLinecap="round"
-        />
+        {/* REWIND label */}
+        <text x={cx} y={cx + 30} textAnchor="middle"
+          fontSize="6" letterSpacing="3.5"
+          fontFamily="'SF Mono', Monaco, 'Courier New', monospace"
+          fill={labelFill}>
+          REWIND
+        </text>
+
       </svg>
     </div>
   )

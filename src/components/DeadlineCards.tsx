@@ -37,6 +37,9 @@ function getUrgencyText(deadline: Date, estimatedHours: number, currentTime: Dat
   const hoursLeft = differenceInHours(deadline, currentTime);
   const workHoursLeft = Math.max(0, hoursLeft - daysLeft * 16);
 
+  if (hoursLeft < 0) {
+    return `${Math.abs(daysLeft)}d overdue. This is a you problem now.`;
+  }
   if (hoursLeft < 24) {
     return `${hoursLeft}h left. You need ${estimatedHours}h. This is not happening.`;
   }
@@ -140,7 +143,7 @@ function DeadlineCard({
                 <stop offset="100%" stopColor={ringColor} stopOpacity="0" />
               </radialGradient>
             </defs>
-            <circle cx="50" cy="50" r="45" fill="url(#urgencyGradient)" />
+            <circle cx="50" cy="50" r="45" fill={`url(#urgencyGradient-${deadline.id})`} />
             <circle
               cx="50"
               cy="50"

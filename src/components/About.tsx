@@ -24,7 +24,7 @@ export default function About({ isOpen, onClose }: { isOpen: boolean; onClose: (
               <h2 className="text-xl font-semibold">About Rewind</h2>
               <button
                 onClick={onClose}
-                className="text-gray-500 hover:text-gray-300 transition-colors"
+                className="text-gray-500 hover:text-gray-300 transition-colors text-xl leading-none"
               >
                 ×
               </button>
@@ -34,7 +34,7 @@ export default function About({ isOpen, onClose }: { isOpen: boolean; onClose: (
               <p className="text-gray-300 leading-relaxed">
                 The numbers are mirrored because the way we experience time is backwards — we think we have more than we do, until we don't.
               </p>
-              
+
               <p className="text-gray-400 text-sm leading-relaxed">
                 Rewind tracks what remains, not what has passed. The clock runs backward because our perception of time is inverted: we always assume there's more, until suddenly there isn't.
               </p>

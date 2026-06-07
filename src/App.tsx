@@ -1,123 +1,131 @@
-import { useState, useEffect } from 'react'
-import { motion } from 'framer-motion'
-import ReverseClock from './components/ReverseClock'
-import ContextSentence from './components/ContextSentence'
-import DeadlineCards from './components/DeadlineCards'
-import TimeAnalytics from './components/TimeAnalytics'
-import TimeLeftDisplay from './components/TimeLeftDisplay'
-import FocusMode from './components/FocusMode'
-import CommandPalette from './components/CommandPalette'
-import Settings from './components/Settings'
-import About from './components/About'
-import { useStore } from './store'
-import { Maximize2, Settings as SettingsIcon, Clock, Info } from 'lucide-react'
+import { useState, useEffect } from "react";
+import ReverseClock from "./components/ReverseClock";
+import ContextSentence from "./components/ContextSentence";
+import DeadlineCards from "./components/DeadlineCards";
+import TimeAnalytics from "./components/TimeAnalytics";
+import TimeLeftDisplay from "./components/TimeLeftDisplay";
+import FocusMode from "./components/FocusMode";
+import CommandPalette from "./components/CommandPalette";
+import Settings from "./components/Settings";
+import About from "./components/About";
+import { useStore } from "./store";
+import { Maximize2, Settings as SettingsIcon, Clock, Info } from "lucide-react";
 
 export default function App() {
-  const { settings, toggleFocusMode } = useStore()
-  const [isSettingsOpen, setIsSettingsOpen] = useState(false)
-  const [isAboutOpen, setIsAboutOpen] = useState(false)
-  const [currentTime, setCurrentTime] = useState(new Date())
+  const { settings, toggleFocusMode } = useStore();
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isAboutOpen, setIsAboutOpen] = useState(false);
+  const [currentTime, setCurrentTime] = useState(new Date());
 
-  // Centralized time update - single source of truth for all timers
   useEffect(() => {
-    const interval = setInterval(() => setCurrentTime(new Date()), 1000)
-    return () => clearInterval(interval)
-  }, [])
+    const interval = setInterval(() => setCurrentTime(new Date()), 1000);
+    return () => clearInterval(interval);
+  }, []);
+
+  // Keep <html class="dark"> in sync so Tailwind dark: variants work everywhere
+  useEffect(() => {
+    document.documentElement.classList.toggle("dark", settings.darkMode);
+  }, [settings.darkMode]);
 
   const toggleFullscreen = () => {
     if (!document.fullscreenElement) {
-      document.documentElement.requestFullscreen()
+      document.documentElement.requestFullscreen();
     } else {
-      document.exitFullscreen()
+      document.exitFullscreen();
     }
-  }
+  };
 
-  const themeClass = settings.darkMode ? 'bg-gradient-to-br from-gray-950 via-gray-900 to-gray-950' : 'bg-gradient-to-br from-gray-100 via-gray-50 to-gray-100'
+  const isDark = settings.darkMode;
+  const btnCls = isDark
+    ? "text-gray-500 hover:text-gray-200 transition-colors hover:scale-110 active:scale-95"
+    : "text-gray-400 hover:text-gray-700 transition-colors hover:scale-110 active:scale-95";
 
   if (settings.widgetMode) {
     return (
-      <div className={`fixed inset-0 ${settings.darkMode ? 'bg-gray-950' : 'bg-gray-100'} flex items-center justify-center p-4`}>
-        <div className={`glass-strong rounded-2xl p-6 max-w-sm w-full ${settings.darkMode ? '' : 'bg-white/80'}`}>
+      <div
+        className={`fixed inset-0 ${isDark ? "bg-gray-950" : "bg-gray-50"} flex items-center justify-center p-4`}
+      >
+        <div className="glass-strong rounded-2xl p-6 max-w-sm w-full">
           <div className="aspect-square max-h-[50vh] mx-auto mb-4">
             <ReverseClock currentTime={currentTime} />
           </div>
           <div className="text-center">
-            <p className={`text-sm ${settings.darkMode ? 'text-gray-400' : 'text-gray-600'}`}>Widget Mode</p>
-            <p className={`text-xs mt-1 ${settings.darkMode ? 'text-gray-500' : 'text-gray-400'}`}>Press ⌘W to exit</p>
+            <p className="text-sm text-gray-400">Widget Mode</p>
+            <p className="text-xs mt-1 text-gray-500">Press ⌘W to exit</p>
           </div>
         </div>
       </div>
-    )
+    );
   }
 
   return (
-    <div className={`h-screen w-screen ${themeClass} overflow-hidden p-3 relative`}>
-      {/* Ambient background system - disabled for performance */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        <motion.div
-          className="absolute inset-0 bg-gradient-to-br from-cyan-900/5 via-transparent to-purple-900/5"
-          style={{ backgroundSize: '200% 200%' }}
-        />
-        <motion.div
-          className="absolute inset-0 bg-gradient-to-tl from-amber-900/3 via-transparent to-cyan-900/3"
-          style={{ backgroundSize: '300% 300%' }}
-        />
-      </div>
-
+    <div
+      className={`h-screen w-screen overflow-hidden p-3 relative ${isDark ? "bg-gray-950" : "bg-gray-50"}`}
+    >
       <FocusMode />
       <CommandPalette />
-      <Settings isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
+      <Settings
+        isOpen={isSettingsOpen}
+        onClose={() => setIsSettingsOpen(false)}
+      />
       <About isOpen={isAboutOpen} onClose={() => setIsAboutOpen(false)} />
 
       <div className="h-full flex flex-col gap-2 relative z-10">
-        <div className="text-center flex items-center justify-between px-4">
-          <h1 className={`text-2xl font-light tracking-tight ${settings.darkMode ? 'text-gray-100' : 'text-gray-900'}`}>Rewind</h1>
-          <div className="flex gap-2">
+        {/* Header */}
+        <div className="flex items-center justify-between px-6 py-1">
+          <h1
+            className={`text-xl font-semibold tracking-tight ${isDark ? "text-gray-100" : "text-gray-900"}`}
+          >
+            Rewind
+          </h1>
+          <div className="flex gap-4">
             <button
               onClick={() => setIsAboutOpen(true)}
-              className={`${settings.darkMode ? 'text-gray-500 hover:text-gray-300' : 'text-gray-400 hover:text-gray-600'} transition-colors hover:scale-110 active:scale-95`}
+              className={btnCls}
               title="About"
             >
-              <Info size={20} />
+              <Info size={18} />
             </button>
             <button
               onClick={toggleFocusMode}
-              className={`${settings.darkMode ? 'text-gray-500 hover:text-gray-300' : 'text-gray-400 hover:text-gray-600'} transition-colors hover:scale-110 active:scale-95`}
+              className={btnCls}
               title="Focus Mode"
             >
-              <Clock size={20} />
+              <Clock size={18} />
             </button>
             <button
               onClick={toggleFullscreen}
-              className={`${settings.darkMode ? 'text-gray-500 hover:text-gray-300' : 'text-gray-400 hover:text-gray-600'} transition-colors hover:scale-110 active:scale-95`}
+              className={btnCls}
               title="Fullscreen"
             >
-              <Maximize2 size={20} />
+              <Maximize2 size={18} />
             </button>
             <button
               onClick={() => setIsSettingsOpen(true)}
-              className={`${settings.darkMode ? 'text-gray-500 hover:text-gray-300' : 'text-gray-400 hover:text-gray-600'} transition-colors hover:scale-110 active:scale-95`}
+              className={btnCls}
               title="Settings"
             >
-              <SettingsIcon size={20} />
+              <SettingsIcon size={18} />
             </button>
           </div>
         </div>
 
+        {/* Main grid */}
         <div className="flex-1 grid grid-cols-12 gap-3 min-h-0">
+          {/* Left: clock + context */}
           <div className="col-span-5 flex flex-col gap-3">
-            <div className="glass-strong rounded-xl p-4 flex-1 flex items-center justify-center">
+            <div className="glass rounded-xl p-4 flex-1 flex items-center justify-center">
               <ReverseClock currentTime={currentTime} />
             </div>
             <ContextSentence currentTime={currentTime} />
           </div>
 
-          <div className="col-span-7 grid  gap-3 overflow-y-auto">
+          {/* Right: digital + deadlines + analytics */}
+          <div className="col-span-7 flex flex-col gap-3 overflow-y-auto">
             <TimeLeftDisplay currentTime={currentTime} />
             <div className="glass rounded-xl p-3">
               <DeadlineCards currentTime={currentTime} />
             </div>
-
             <div className="glass rounded-xl p-3">
               <TimeAnalytics currentTime={currentTime} />
             </div>
@@ -125,5 +133,5 @@ export default function App() {
         </div>
       </div>
     </div>
-  )
+  );
 }

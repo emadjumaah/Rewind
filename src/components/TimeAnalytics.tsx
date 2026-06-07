@@ -1,9 +1,8 @@
 import { motion } from 'framer-motion'
-import { differenceInWeeks, differenceInDays, endOfYear, endOfWeek, endOfDay, isWeekend } from 'date-fns'
+import { endOfYear, endOfDay, differenceInWeeks, isWeekend } from 'date-fns'
 
 export default function TimeAnalytics({ currentTime }: { currentTime: Date }) {
   const endOfDayDate = endOfDay(currentTime)
-  const endOfWeekDate = endOfWeek(currentTime)
   const endOfYearDate = endOfYear(currentTime)
 
   const msLeftToday = endOfDayDate.getTime() - currentTime.getTime()
@@ -11,9 +10,14 @@ export default function TimeAnalytics({ currentTime }: { currentTime: Date }) {
   const minsLeftToday = Math.floor((msLeftToday % (1000 * 60 * 60)) / (1000 * 60))
 
   const weekendsLeft = differenceInWeeks(endOfYearDate, currentTime) + (isWeekend(endOfYearDate) ? 1 : 0)
-  const yearProgress = ((currentTime.getTime() - new Date(currentTime.getFullYear(), 0, 1).getTime()) / (endOfYearDate.getTime() - new Date(currentTime.getFullYear(), 0, 1).getTime())) * 100
 
-  const workHoursLeftWeek = 40 - (differenceInDays(currentTime, endOfWeekDate) * -8)
+  const yearStart = new Date(currentTime.getFullYear(), 0, 1)
+  const yearProgress = ((currentTime.getTime() - yearStart.getTime()) / (endOfYearDate.getTime() - yearStart.getTime())) * 100
+
+  // Work hours remaining this week (Mon–Fri, 8h/day)
+  const dayOfWeek = currentTime.getDay() // 0=Sun … 6=Sat
+  const workDaysLeft = dayOfWeek >= 1 && dayOfWeek <= 5 ? 5 - dayOfWeek : 0
+  const workHoursLeftWeek = workDaysLeft * 8
 
   const analytics = [
     {
@@ -23,18 +27,18 @@ export default function TimeAnalytics({ currentTime }: { currentTime: Date }) {
     },
     {
       label: `${weekendsLeft} weekends left this year`,
-      subtext: 'Plan accordingly. Or don\'t.',
+      subtext: "Plan accordingly. Or don't.",
       progress: weekendsLeft / 52,
     },
     {
       label: `${yearProgress.toFixed(0)}% of ${currentTime.getFullYear()} gone`,
-      subtext: 'Quarter remaining: not enough.',
+      subtext: 'Progress: debatable.',
       progress: 1 - yearProgress / 100,
     },
     {
-      label: `Work hours left this week: ${Math.max(0, workHoursLeftWeek)}`,
+      label: `${workHoursLeftWeek}h work hours left this week`,
       subtext: 'Meetings will take half.',
-      progress: Math.max(0, workHoursLeftWeek) / 40,
+      progress: workHoursLeftWeek / 40,
     },
   ]
 
@@ -46,7 +50,7 @@ export default function TimeAnalytics({ currentTime }: { currentTime: Date }) {
 
   return (
     <div className="space-y-2">
-      <h2 className="text-lg font-semibold text-gray-200">Time Remaining</h2>
+      <h2 className="text-sm font-semibold text-gray-300 tracking-wide uppercase">Time Remaining</h2>
       <div className="grid grid-cols-2 gap-2">
         {analytics.map((item, index) => {
           const circumference = 2 * Math.PI * 28
@@ -56,9 +60,9 @@ export default function TimeAnalytics({ currentTime }: { currentTime: Date }) {
           return (
             <motion.div
               key={index}
-              initial={{ opacity: 0, scale: 0.8 }}
+              initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: index * 0.1 }}
+              transition={{ delay: index * 0.08 }}
               className="glass rounded-lg p-3 flex flex-col items-center"
             >
               <div className="relative mb-2">
@@ -69,24 +73,10 @@ export default function TimeAnalytics({ currentTime }: { currentTime: Date }) {
                       <stop offset="100%" stopColor={ringColor} stopOpacity="0" />
                     </radialGradient>
                   </defs>
-                  <circle
-                    cx="30"
-                    cy="30"
-                    r="28"
-                    fill={`url(#analyticsGradient-${index})`}
-                  />
-                  <circle
-                    cx="30"
-                    cy="30"
-                    r="28"
-                    fill="none"
-                    stroke="rgba(255,255,255,0.05)"
-                    strokeWidth="3"
-                  />
+                  <circle cx="30" cy="30" r="28" fill={`url(#analyticsGradient-${index})`} />
+                  <circle cx="30" cy="30" r="28" fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="3" />
                   <motion.circle
-                    cx="30"
-                    cy="30"
-                    r="28"
+                    cx="30" cy="30" r="28"
                     fill="none"
                     stroke={ringColor}
                     strokeWidth="3"
@@ -94,7 +84,7 @@ export default function TimeAnalytics({ currentTime }: { currentTime: Date }) {
                     strokeDasharray={circumference}
                     initial={{ strokeDashoffset: circumference }}
                     animate={{ strokeDashoffset }}
-                    transition={{ duration: 1, delay: index * 0.1 }}
+                    transition={{ duration: 1, delay: index * 0.08 }}
                     style={{ transform: 'rotate(-90deg)', transformOrigin: '30px 30px' }}
                   />
                 </svg>
@@ -107,7 +97,7 @@ export default function TimeAnalytics({ currentTime }: { currentTime: Date }) {
               <span className="text-gray-200 text-xs font-medium tracking-tight text-center leading-tight">
                 {item.label}
               </span>
-              <p className="text-gray-500 text-[10px] text-center mt-1">{item.subtext}</p>
+              <p className="text-gray-500 text-[10px] text-center mt-1 leading-snug">{item.subtext}</p>
             </motion.div>
           )
         })}
