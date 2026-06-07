@@ -38,8 +38,9 @@ The backward clock isn't a gimmick. It's the whole philosophy: time is always ru
 - **Deadline Cards** - Shows days/hours remaining with honest urgency assessments. Red means you're in trouble. You probably are.
 - **Time Analytics** - Real calculated stats with dry commentary. The year is almost over. Again.
 - **Focus Mode** - Fullscreen countdown. 90 minutes. No excuses. Just work.
-- **Command Palette** - Press `⌘K` to access commands. Because clicking is for people with time to waste.
+- **Command Palette** - Press `⌘K` or click the command icon. All actions in one place, for when navigating menus is too optimistic.
 - **Widget Mode** - For your second monitor. So you can stare at your mortality while you work.
+- **Installable PWA** - Install it to your dock from Chrome or Edge. No app store. No waiting. Just a constant reminder on your desktop.
 
 ---
 
@@ -53,7 +54,7 @@ Built with modern tools to track ancient problems.
 
 ## Getting started
 
-**Live Demo:** https://rewind-gules.vercel.app/
+**Live Demo:** https://rewind.uts.qa
 
 ```bash
 npm install
