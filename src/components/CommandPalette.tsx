@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useStore } from '../store'
+import { useT, useDir } from '../i18n'
 import { X, Clock, Settings as SettingsIcon, Plus, Trash2, RotateCcw, Moon, Sun, Monitor } from 'lucide-react'
 
 export default function CommandPalette() {
@@ -13,8 +14,11 @@ export default function CommandPalette() {
     removeDeadline,
     settings,
     updateSettings,
-    toggleWidgetMode
+    toggleWidgetMode,
   } = useStore()
+
+  const T = useT()
+  const dir = useDir()
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -33,51 +37,51 @@ export default function CommandPalette() {
   const commands = [
     {
       icon: <Clock size={18} />,
-      label: 'Start Focus Mode',
-      desc: '90 minutes. No excuses.',
+      label: T.cmdFocusLabel,
+      desc: T.cmdFocusDesc,
       action: () => { toggleFocusMode(); setCommandPaletteOpen(false) },
       shortcut: '⌘F',
     },
     {
       icon: <Plus size={18} />,
-      label: 'Add Deadline',
-      desc: 'Another thing you probably won\'t finish.',
+      label: T.cmdAddLabel,
+      desc: T.cmdAddDesc,
       action: () => { setDeadlineModalOpen(true); setCommandPaletteOpen(false) },
       shortcut: '⌘D',
     },
     {
       icon: <SettingsIcon size={18} />,
-      label: 'Open Settings',
-      desc: 'Change the theme. Not the deadline.',
-      action: () => { setCommandPaletteOpen(false) },
+      label: T.cmdOpenSettings,
+      desc: T.cmdOpenSettingsDesc,
+      action: () => setCommandPaletteOpen(false),
       shortcut: '⌘S',
     },
     {
       icon: settings.darkMode ? <Sun size={18} /> : <Moon size={18} />,
-      label: settings.darkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode',
-      desc: settings.darkMode ? 'For people who like seeing things.' : 'For staring at your failures in the dark.',
+      label: settings.darkMode ? T.cmdLightMode : T.cmdDarkMode,
+      desc: settings.darkMode ? T.cmdLightModeDesc : T.cmdDarkModeDesc,
       action: () => { updateSettings({ darkMode: !settings.darkMode }); setCommandPaletteOpen(false) },
       shortcut: '⌘L',
     },
     {
       icon: <Monitor size={18} />,
-      label: settings.widgetMode ? 'Exit Widget Mode' : 'Widget Mode',
-      desc: settings.widgetMode ? 'Back to full guilt.' : 'For your second monitor. Dual productivity theater.',
+      label: settings.widgetMode ? T.cmdExitWidget : T.cmdWidgetMode,
+      desc: settings.widgetMode ? T.cmdExitWidgetDesc : T.cmdWidgetDesc,
       action: () => { toggleWidgetMode(); setCommandPaletteOpen(false) },
       shortcut: '⌘W',
     },
     {
       icon: <Trash2 size={18} />,
-      label: 'Clear All Deadlines',
-      desc: 'They don\'t disappear. You just stop looking.',
+      label: T.cmdClearAll,
+      desc: T.cmdClearDesc,
       action: () => { deadlines.forEach(d => removeDeadline(d.id)); setCommandPaletteOpen(false) },
       shortcut: '⌘⌫',
       destructive: true,
     },
     {
       icon: <RotateCcw size={18} />,
-      label: 'Reset Settings',
-      desc: 'A fresh start you\'ll squander just the same.',
+      label: T.cmdReset,
+      desc: T.cmdResetDesc,
       action: () => { updateSettings({ focusSessionLength: 90 }); setCommandPaletteOpen(false) },
       shortcut: '⌘R',
     },
@@ -98,11 +102,12 @@ export default function CommandPalette() {
           initial={{ opacity: 0, y: -20, scale: 0.95 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: -20, scale: 0.95 }}
-          className="glass-strong rounded-2xl w-full max-w-md overflow-hidden"
+          className="glass-strong rounded-2xl w-full max-w-md overflow-hidden mx-4"
           onClick={(e) => e.stopPropagation()}
+          dir={dir}
         >
           <div className="p-4 border-b border-white/10 flex items-center justify-between">
-            <span className="text-gray-500 text-sm font-mono tracking-wide">⌘ commands</span>
+            <span className="text-gray-500 text-sm font-mono tracking-wide">{T.cmdTitle}</span>
             <button
               onClick={() => setCommandPaletteOpen(false)}
               className="text-gray-500 hover:text-gray-300 transition-colors"
@@ -127,9 +132,7 @@ export default function CommandPalette() {
                   <span className={`block text-sm ${command.destructive ? 'text-red-300' : 'text-gray-200'}`}>
                     {command.label}
                   </span>
-                  {'desc' in command && (
-                    <span className="block text-xs text-gray-500 mt-0.5 italic">{command.desc}</span>
-                  )}
+                  <span className="block text-xs text-gray-500 mt-0.5 italic">{command.desc}</span>
                 </span>
                 <span className="text-gray-600 text-xs font-mono shrink-0">{command.shortcut}</span>
               </motion.button>

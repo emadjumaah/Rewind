@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useStore, Deadline } from "../store";
+import { useT, useDir } from "../i18n";
 import { differenceInDays, differenceInHours } from "date-fns";
 import { X, Plus, Edit } from "lucide-react";
 import DeadlineModal from "./DeadlineModal";
@@ -15,7 +16,7 @@ function getUrgencyColor(deadline: Date): string {
     return "border-2 border-amber-500/50 shadow-md shadow-amber-500/15 bg-gradient-to-br from-amber-500/10 to-amber-900/5";
   if (hoursLeft < 168)
     return "border border-blue-500/40 shadow-sm shadow-blue-500/10 bg-gradient-to-br from-blue-500/5 to-blue-900/5";
-  return "border border-cyan-500/30 shadow-sm shadow-cyan-500/5 bg-gradient-to-br from-cyan-500/5 to-cyan-900/5";
+  return "border border-blue-500/30 shadow-sm shadow-blue-500/5 bg-gradient-to-br from-blue-500/5 to-blue-900/5";
 }
 
 function getUrgencyRingColor(deadline: Date): string {
@@ -24,23 +25,19 @@ function getUrgencyRingColor(deadline: Date): string {
   if (hoursLeft < 24) return "rgba(239, 68, 68, 0.8)";
   if (hoursLeft < 72) return "rgba(245, 158, 11, 0.8)";
   if (hoursLeft < 168) return "rgba(59, 130, 246, 0.8)";
-  return "rgba(6, 182, 212, 0.8)";
+  return "rgba(59, 130, 246, 0.8)";
 }
 
-function getUrgencyText(deadline: Date, estimatedHours: number, currentTime: Date): string {
+function getUrgencyText(deadline: Date, estimatedHours: number, currentTime: Date, T: ReturnType<typeof useT>): string {
   const daysLeft = differenceInDays(deadline, currentTime);
   const hoursLeft = differenceInHours(deadline, currentTime);
   const workHoursLeft = Math.max(0, hoursLeft - daysLeft * 16);
 
-  if (hoursLeft < 0)
-    return `${Math.abs(daysLeft)}d overdue. This is a you problem now.`;
-  if (hoursLeft < 24)
-    return `${hoursLeft}h left. You need ${estimatedHours}h. This is not happening.`;
-  if (hoursLeft < 72)
-    return `${daysLeft} days, ${hoursLeft % 24}h left. You need ${estimatedHours}h. This is a you problem.`;
-  if (estimatedHours > workHoursLeft)
-    return `${daysLeft} days left. You need ${estimatedHours}h. You have ${workHoursLeft}h work hours. Good luck.`;
-  return `${daysLeft} days left. You need ${estimatedHours}h. This is fine. Probably.`;
+  if (hoursLeft < 0)   return T.overdue(Math.abs(daysLeft));
+  if (hoursLeft < 24)  return T.urgentCritical(hoursLeft, estimatedHours);
+  if (hoursLeft < 72)  return T.urgentHigh(daysLeft, hoursLeft % 24, estimatedHours);
+  if (estimatedHours > workHoursLeft) return T.urgentMedium(daysLeft, estimatedHours, workHoursLeft);
+  return T.normal(daysLeft, estimatedHours);
 }
 
 function DeadlineCard({
@@ -54,6 +51,7 @@ function DeadlineCard({
   onEdit: (deadline: Deadline) => void;
   currentTime: Date;
 }) {
+  const T = useT();
   const deadlineDate =
     deadline.deadline instanceof Date
       ? deadline.deadline
@@ -125,7 +123,7 @@ function DeadlineCard({
             {deadline.title}
           </h3>
           <p className="text-gray-400 text-xs leading-relaxed">
-            {getUrgencyText(deadlineDate, deadline.estimatedHours, currentTime)}
+            {getUrgencyText(deadlineDate, deadline.estimatedHours, currentTime, T)}
           </p>
           <p className="text-gray-500 text-[10px] mt-1 tabular-nums">
             {deadlineDate.toLocaleDateString("en-US", {
@@ -140,7 +138,7 @@ function DeadlineCard({
 
       <button
         onClick={() => onEdit(deadline)}
-        className="absolute bottom-2 right-2 text-gray-600 hover:text-cyan-400 transition-colors z-10"
+        className="absolute bottom-2 right-2 text-gray-600 hover:text-blue-400 transition-colors z-10"
         title="Edit"
       >
         <Edit size={13} />
@@ -151,6 +149,8 @@ function DeadlineCard({
 
 function DeadlineCards({ currentTime }: { currentTime: Date }) {
   const { deadlines, removeDeadline, isDeadlineModalOpen, setDeadlineModalOpen } = useStore();
+  const T = useT();
+  const dir = useDir();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingDeadline, setEditingDeadline] = useState<Deadline | undefined>();
 
@@ -174,28 +174,30 @@ function DeadlineCards({ currentTime }: { currentTime: Date }) {
   };
 
   return (
-    <div className="space-y-2">
-      <div className="flex justify-between items-center mb-1">
-        <h2 className="text-sm font-semibold text-gray-300 tracking-wide uppercase">Deadlines</h2>
+    <div className="flex flex-col md:h-full gap-2" dir={dir}>
+      {/* Header — fixed, never scrolls away */}
+      <div className="flex justify-between items-center shrink-0">
+        <h2 className="text-sm font-semibold text-gray-300 tracking-wide uppercase">{T.deadlines}</h2>
         <button
           onClick={handleAdd}
-          className="flex items-center gap-1 text-xs text-cyan-400 hover:text-cyan-300 transition-colors px-2 py-1 rounded-md hover:bg-cyan-500/10"
-          title="Add deadline"
+          className="flex items-center gap-1 text-xs text-blue-400 hover:text-blue-300 transition-colors px-2 py-1 rounded-md hover:bg-blue-500/10"
+          title={T.addDeadlineTooltip}
         >
           <Plus size={14} />
-          <span>Add</span>
+          <span>{T.add}</span>
         </button>
       </div>
 
       {deadlines.length === 0 ? (
         <button
           onClick={handleAdd}
-          className="w-full py-5 border border-dashed border-gray-700 rounded-xl text-gray-500 hover:border-cyan-500/50 hover:text-cyan-400 transition-all text-sm"
+          className="w-full py-5 border border-dashed border-gray-700 rounded-xl text-gray-500 hover:border-blue-500/50 hover:text-blue-400 transition-all text-sm"
         >
-          + Add your first deadline
+          {T.addFirst}
         </button>
       ) : (
-        <div className="grid gap-2">
+        /* Scrollable list — fills remaining height on desktop, natural flow on mobile */
+        <div className="deadline-list grid gap-2 md:overflow-y-auto md:flex-1 md:min-h-0 md:pr-0.5">
           {deadlines.map((deadline) => (
             <DeadlineCard
               key={deadline.id}
@@ -207,9 +209,9 @@ function DeadlineCards({ currentTime }: { currentTime: Date }) {
           ))}
           <button
             onClick={handleAdd}
-            className="w-full py-2 border border-dashed border-gray-800 hover:border-cyan-500/40 rounded-lg text-gray-600 hover:text-cyan-400 transition-all text-xs"
+            className="w-full py-2 border border-dashed border-gray-800 hover:border-blue-500/40 rounded-lg text-gray-600 hover:text-blue-400 transition-all text-xs"
           >
-            + Add another
+            {T.addAnother}
           </button>
         </div>
       )}

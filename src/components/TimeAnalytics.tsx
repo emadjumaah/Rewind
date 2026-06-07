@@ -1,7 +1,10 @@
 import React from 'react'
 import { endOfYear, endOfDay, differenceInWeeks, isWeekend } from 'date-fns'
+import { useT } from '../i18n'
 
 function TimeAnalytics({ currentTime }: { currentTime: Date }) {
+  const T = useT()
+
   const endOfDayDate = endOfDay(currentTime)
   const endOfYearDate = endOfYear(currentTime)
 
@@ -23,36 +26,36 @@ function TimeAnalytics({ currentTime }: { currentTime: Date }) {
 
   const analytics = [
     {
-      label: `${hoursLeftToday}h ${minsLeftToday}m left today`,
-      subtext: 'You probably need double that.',
+      label: T.todayLeft(hoursLeftToday, minsLeftToday),
+      subtext: T.todaySubtext,
       progress: msLeftToday / (24 * 60 * 60 * 1000),
     },
     {
-      label: `${weekendsLeft} weekends left this year`,
-      subtext: "Plan accordingly. Or don't.",
+      label: T.weekendsLeft(weekendsLeft),
+      subtext: T.weekendsSubtext,
       progress: weekendsLeft / 52,
     },
     {
-      label: `${yearProgress.toFixed(0)}% of ${currentTime.getFullYear()} gone`,
-      subtext: 'Progress: debatable.',
+      label: T.yearGone(yearProgress.toFixed(0), currentTime.getFullYear()),
+      subtext: T.yearSubtext,
       progress: 1 - yearProgress / 100,
     },
     {
-      label: `${workHoursLeftWeek}h work hours left this week`,
-      subtext: 'Meetings will take half.',
+      label: T.workHoursLeft(workHoursLeftWeek),
+      subtext: T.workHoursSubtext,
       progress: workHoursLeftWeek / 40,
     },
   ]
 
   const getRingColor = (progress: number) => {
-    if (progress > 0.6) return 'rgba(6, 182, 212, 0.8)'
+    if (progress > 0.6) return 'rgba(59, 130, 246, 0.8)'
     if (progress > 0.3) return 'rgba(245, 158, 11, 0.8)'
     return 'rgba(239, 68, 68, 0.8)'
   }
 
   return (
     <div className="space-y-2">
-      <h2 className="text-sm font-semibold text-gray-300 tracking-wide uppercase">Time Remaining</h2>
+      <h2 className="text-sm font-semibold text-gray-300 tracking-wide uppercase">{T.sectionTimeRemaining}</h2>
       <div className="grid grid-cols-2 gap-2">
         {analytics.map((item, index) => {
           const circumference = 2 * Math.PI * 28
@@ -60,10 +63,7 @@ function TimeAnalytics({ currentTime }: { currentTime: Date }) {
           const ringColor = getRingColor(item.progress)
 
           return (
-            <div
-              key={index}
-              className="glass rounded-lg p-3 flex flex-col items-center"
-            >
+            <div key={index} className="glass rounded-lg p-3 flex flex-col items-center">
               <div className="relative mb-2">
                 <svg className="w-16 h-16" viewBox="0 0 60 60">
                   <defs>
@@ -107,7 +107,6 @@ function TimeAnalytics({ currentTime }: { currentTime: Date }) {
   )
 }
 
-// Only re-render when the minute changes — values don't change second-to-second
 export default React.memo(TimeAnalytics, (prev, next) =>
   prev.currentTime.getMinutes() === next.currentTime.getMinutes() &&
   prev.currentTime.getHours() === next.currentTime.getHours()

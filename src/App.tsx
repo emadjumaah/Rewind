@@ -9,10 +9,21 @@ import CommandPalette from "./components/CommandPalette";
 import Settings from "./components/Settings";
 import About from "./components/About";
 import { useStore } from "./store";
-import { Maximize2, Settings as SettingsIcon, Clock, Info, Command } from "lucide-react";
+import { useT } from "./i18n";
+import {
+  Maximize2,
+  Settings as SettingsIcon,
+  Clock,
+  Info,
+  Command,
+  Sun,
+  Moon,
+} from "lucide-react";
 
 export default function App() {
-  const { settings, toggleFocusMode, setCommandPaletteOpen } = useStore();
+  const { settings, updateSettings, toggleFocusMode, setCommandPaletteOpen } =
+    useStore();
+  const T = useT();
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isAboutOpen, setIsAboutOpen] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
@@ -50,8 +61,8 @@ export default function App() {
             <ReverseClock currentTime={currentTime} />
           </div>
           <div className="text-center">
-            <p className="text-sm text-gray-400">Widget Mode</p>
-            <p className="text-xs mt-1 text-gray-500">Press ⌘W to exit</p>
+            <p className="text-sm text-gray-400">{T.widgetMode}</p>
+            <p className="text-xs mt-1 text-gray-500">{T.widgetExit}</p>
           </div>
         </div>
       </div>
@@ -76,9 +87,9 @@ export default function App() {
           <h1
             className={`text-xl font-semibold tracking-tight ${isDark ? "text-gray-100" : "text-gray-900"}`}
           >
-            Rewind
+            {T.appName}
           </h1>
-          <div className="flex gap-3 md:gap-4">
+          <div className="flex items-center gap-3 md:gap-4">
             <button
               onClick={() => setCommandPaletteOpen(true)}
               className={btnCls}
@@ -100,6 +111,33 @@ export default function App() {
             >
               <Clock size={18} />
             </button>
+
+            {/* Language toggle */}
+            <button
+              onClick={() =>
+                updateSettings({
+                  language: settings.language === "ar" ? "en" : "ar",
+                })
+              }
+              className={`${btnCls} text-[11px] font-bold tracking-widest leading-none w-7 text-center`}
+              title={
+                settings.language === "ar"
+                  ? "Switch to English"
+                  : "التبديل للعربية"
+              }
+            >
+              {settings.language === "ar" ? "EN" : "ع"}
+            </button>
+
+            {/* Dark / light toggle */}
+            <button
+              onClick={() => updateSettings({ darkMode: !settings.darkMode })}
+              className={btnCls}
+              title={isDark ? "Light mode" : "Dark mode"}
+            >
+              {isDark ? <Sun size={17} /> : <Moon size={17} />}
+            </button>
+
             <button
               onClick={toggleFullscreen}
               className={`${btnCls} hidden md:block`}
@@ -132,12 +170,13 @@ export default function App() {
           </div>
 
           {/* Right: digital + deadlines + analytics */}
-          <div className="md:col-span-7 flex flex-col gap-3 md:overflow-y-auto md:min-h-0 pb-4 md:pb-0">
+          <div className="md:col-span-7 flex flex-col gap-3 md:min-h-0 pb-4 md:pb-0">
             <TimeLeftDisplay currentTime={currentTime} />
-            <div className="glass rounded-xl p-3">
+            {/* Deadlines grow to fill available space; list scrolls internally on desktop */}
+            <div className="glass rounded-xl p-3 md:flex-1 md:min-h-0 md:overflow-hidden">
               <DeadlineCards currentTime={currentTime} />
             </div>
-            <div className="glass rounded-xl p-3">
+            <div className="glass rounded-xl p-3 shrink-0">
               <TimeAnalytics currentTime={currentTime} />
             </div>
           </div>

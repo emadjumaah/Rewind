@@ -67,3 +67,31 @@ html:not(.dark) select,
 html:not(.dark) textarea {
   color-scheme: light;
 }
+
+/* ── Deadline list thin scrollbar ── */
+.deadline-list {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.08) transparent;
+}
+.deadline-list::-webkit-scrollbar {
+  width: 3px;
+}
+.deadline-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+.deadline-list::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 99px;
+}
+.deadline-list::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+html:not(.dark) .deadline-list {
+  scrollbar-color: rgba(0, 0, 0, 0.08) transparent;
+}
+html:not(.dark) .deadline-list::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.1);
+}
+html:not(.dark) .deadline-list::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.2);
+}

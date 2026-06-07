@@ -15,6 +15,7 @@ export interface Settings {
   focusSessionLength: number
   widgetMode: boolean
   darkMode: boolean
+  language: 'en' | 'ar'
 }
 
 interface AppState {
@@ -65,6 +66,7 @@ export const useStore = create<AppState>()(
         focusSessionLength: 90,
         widgetMode: false,
         darkMode: true,
+        language: 'en',
       },
       isFocusMode: false,
       isCommandPaletteOpen: false,
