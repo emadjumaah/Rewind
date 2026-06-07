@@ -9,6 +9,24 @@ const getContextualMessage = (deadlines: Deadline[], currentTime: Date): string 
   const hour = currentTime.getHours()
   const day  = currentTime.getDay()
 
+  if (day === 1) return pick([
+    "Monday. You'll say you'll start fresh. You won't.",
+    "New week. Same you. Lower expectations this time.",
+    "Monday again. The calendar is merciless.",
+  ])
+
+  if (day === 5) return pick([
+    "Friday. You'll pretend to work while planning the weekend.",
+    "End of the week. Whatever wasn't done isn't getting done today.",
+    "Friday afternoon. The work week's most convincing lie.",
+  ])
+
+  if (day === 0 || day === 6) return pick([
+    "Weekend. You'll rest instead of catching up. Again.",
+    "It's the weekend. The deadlines don't know that.",
+    "A day off. Your future self will pay for this.",
+  ])
+
   if (hour >= 5 && hour < 9) {
     return pick([
       "The day begins. So does the procrastination.",
@@ -80,24 +98,6 @@ const getContextualMessage = (deadlines: Deadline[], currentTime: Date): string 
       "Working at midnight doesn't make you dedicated. It makes you disorganized.",
     ])
   }
-
-  if (day === 1) return pick([
-    "Monday. You'll say you'll start fresh. You won't.",
-    "New week. Same you. Lower expectations this time.",
-    "Monday again. The calendar is merciless.",
-  ])
-
-  if (day === 5) return pick([
-    "Friday. You'll pretend to work while planning the weekend.",
-    "End of the week. Whatever wasn't done isn't getting done today.",
-    "Friday afternoon. The work week's most convincing lie.",
-  ])
-
-  if (day === 0 || day === 6) return pick([
-    "Weekend. You'll rest instead of catching up. Again.",
-    "It's the weekend. The deadlines don't know that.",
-    "A day off. Your future self will pay for this.",
-  ])
 
   const urgentDeadlines = deadlines.filter(d => {
     const deadlineDate = d.deadline instanceof Date ? d.deadline : new Date(d.deadline)

@@ -14,10 +14,13 @@ export default function TimeAnalytics({ currentTime }: { currentTime: Date }) {
   const yearStart = new Date(currentTime.getFullYear(), 0, 1)
   const yearProgress = ((currentTime.getTime() - yearStart.getTime()) / (endOfYearDate.getTime() - yearStart.getTime())) * 100
 
-  // Work hours remaining this week (Mon–Fri, 8h/day)
-  const dayOfWeek = currentTime.getDay() // 0=Sun … 6=Sat
-  const workDaysLeft = dayOfWeek >= 1 && dayOfWeek <= 5 ? 5 - dayOfWeek : 0
-  const workHoursLeftWeek = workDaysLeft * 8
+  // Work hours remaining this week (Mon–Fri, 9–17)
+  const dayOfWeek = currentTime.getDay()
+  const isWorkday = dayOfWeek >= 1 && dayOfWeek <= 5
+  const totalMinsToday = currentTime.getHours() * 60 + currentTime.getMinutes()
+  const todayHoursLeft = isWorkday ? Math.max(0, (17 * 60 - totalMinsToday) / 60) : 0
+  const fullDaysAfterToday = isWorkday ? Math.max(0, 5 - dayOfWeek) : 0
+  const workHoursLeftWeek = Math.round(fullDaysAfterToday * 8 + todayHoursLeft)
 
   const analytics = [
     {

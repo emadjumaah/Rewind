@@ -9,10 +9,10 @@ import CommandPalette from "./components/CommandPalette";
 import Settings from "./components/Settings";
 import About from "./components/About";
 import { useStore } from "./store";
-import { Maximize2, Settings as SettingsIcon, Clock, Info } from "lucide-react";
+import { Maximize2, Settings as SettingsIcon, Clock, Info, Command } from "lucide-react";
 
 export default function App() {
-  const { settings, toggleFocusMode } = useStore();
+  const { settings, toggleFocusMode, setCommandPaletteOpen } = useStore();
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isAboutOpen, setIsAboutOpen] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
@@ -79,6 +79,13 @@ export default function App() {
             Rewind
           </h1>
           <div className="flex gap-4">
+            <button
+              onClick={() => setCommandPaletteOpen(true)}
+              className={btnCls}
+              title="Commands ⌘K"
+            >
+              <Command size={18} />
+            </button>
             <button
               onClick={() => setIsAboutOpen(true)}
               className={btnCls}
