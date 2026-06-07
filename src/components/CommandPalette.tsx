@@ -7,6 +7,7 @@ export default function CommandPalette() {
   const {
     isCommandPaletteOpen,
     setCommandPaletteOpen,
+    setDeadlineModalOpen,
     toggleFocusMode,
     deadlines,
     removeDeadline,
@@ -41,7 +42,7 @@ export default function CommandPalette() {
       icon: <Plus size={18} />,
       label: 'Add Deadline',
       desc: 'Another thing you probably won\'t finish.',
-      action: () => { setCommandPaletteOpen(false) },
+      action: () => { setDeadlineModalOpen(true); setCommandPaletteOpen(false) },
       shortcut: '⌘D',
     },
     {

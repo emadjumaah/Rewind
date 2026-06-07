@@ -60,7 +60,7 @@ export default function App() {
 
   return (
     <div
-      className={`h-screen w-screen overflow-hidden p-3 relative ${isDark ? "bg-gray-950" : "bg-gray-50"}`}
+      className={`min-h-screen md:h-screen w-screen md:overflow-hidden p-3 relative ${isDark ? "bg-gray-950" : "bg-gray-50"}`}
     >
       <FocusMode />
       <CommandPalette />
@@ -70,15 +70,15 @@ export default function App() {
       />
       <About isOpen={isAboutOpen} onClose={() => setIsAboutOpen(false)} />
 
-      <div className="h-full flex flex-col gap-2 relative z-10">
+      <div className="flex flex-col gap-2 relative z-10 md:h-full">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-1">
+        <div className="flex items-center justify-between px-4 md:px-6 py-1">
           <h1
             className={`text-xl font-semibold tracking-tight ${isDark ? "text-gray-100" : "text-gray-900"}`}
           >
             Rewind
           </h1>
-          <div className="flex gap-4">
+          <div className="flex gap-3 md:gap-4">
             <button
               onClick={() => setCommandPaletteOpen(true)}
               className={btnCls}
@@ -102,7 +102,7 @@ export default function App() {
             </button>
             <button
               onClick={toggleFullscreen}
-              className={btnCls}
+              className={`${btnCls} hidden md:block`}
               title="Fullscreen"
             >
               <Maximize2 size={18} />
@@ -117,18 +117,22 @@ export default function App() {
           </div>
         </div>
 
-        {/* Main grid */}
-        <div className="flex-1 grid grid-cols-12 gap-3 min-h-0">
-          {/* Left: clock + context */}
-          <div className="col-span-5 flex flex-col gap-3">
-            <div className="glass rounded-xl p-4 flex-1 flex items-center justify-center">
-              <ReverseClock currentTime={currentTime} />
+        {/* Context sentence — full-width banner, impossible to miss */}
+        <ContextSentence currentTime={currentTime} />
+
+        {/* Main grid — stacks on mobile, side-by-side on md+ */}
+        <div className="md:flex-1 grid grid-cols-1 md:grid-cols-12 gap-3 md:min-h-0">
+          {/* Left: clock */}
+          <div className="md:col-span-5 flex flex-col gap-3 md:min-h-0">
+            <div className="glass rounded-xl p-4 flex items-center justify-center h-56 md:h-auto md:flex-1 md:min-h-0">
+              <div className="w-52 h-52 md:w-full md:h-full">
+                <ReverseClock currentTime={currentTime} />
+              </div>
             </div>
-            <ContextSentence currentTime={currentTime} />
           </div>
 
           {/* Right: digital + deadlines + analytics */}
-          <div className="col-span-7 flex flex-col gap-3 overflow-y-auto">
+          <div className="md:col-span-7 flex flex-col gap-3 md:overflow-y-auto md:min-h-0 pb-4 md:pb-0">
             <TimeLeftDisplay currentTime={currentTime} />
             <div className="glass rounded-xl p-3">
               <DeadlineCards currentTime={currentTime} />

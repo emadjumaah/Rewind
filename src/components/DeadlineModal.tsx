@@ -53,7 +53,7 @@ export default function DeadlineModal({ isOpen, onClose, deadline }: DeadlineMod
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50"
+          className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-end md:items-center justify-center z-50 p-4 md:p-0"
           onClick={onClose}
         >
           <motion.div
@@ -61,7 +61,7 @@ export default function DeadlineModal({ isOpen, onClose, deadline }: DeadlineMod
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.95, opacity: 0 }}
             onClick={(e) => e.stopPropagation()}
-            className="glass-strong rounded-xl p-6 w-full max-w-md"
+            className="glass-strong rounded-t-2xl md:rounded-2xl p-6 w-full md:max-w-md"
           >
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl font-semibold text-gray-100">

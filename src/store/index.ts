@@ -22,12 +22,14 @@ interface AppState {
   settings: Settings
   isFocusMode: boolean
   isCommandPaletteOpen: boolean
+  isDeadlineModalOpen: boolean
   addDeadline: (deadline: Omit<Deadline, 'id'>) => void
   updateDeadline: (id: string, deadline: Omit<Deadline, 'id'>) => void
   removeDeadline: (id: string) => void
   updateSettings: (settings: Partial<Settings>) => void
   toggleFocusMode: () => void
   setCommandPaletteOpen: (open: boolean) => void
+  setDeadlineModalOpen: (open: boolean) => void
   toggleWidgetMode: () => void
 }
 
@@ -66,6 +68,7 @@ export const useStore = create<AppState>()(
       },
       isFocusMode: false,
       isCommandPaletteOpen: false,
+      isDeadlineModalOpen: false,
       addDeadline: (deadline) =>
         set((state) => ({
           deadlines: [...state.deadlines, { ...deadline, id: Date.now().toString() }],
@@ -86,6 +89,7 @@ export const useStore = create<AppState>()(
         })),
       toggleFocusMode: () => set((state) => ({ isFocusMode: !state.isFocusMode })),
       setCommandPaletteOpen: (open) => set({ isCommandPaletteOpen: open }),
+      setDeadlineModalOpen: (open) => set({ isDeadlineModalOpen: open }),
       toggleWidgetMode: () => set((state) => ({ settings: { ...state.settings, widgetMode: !state.settings.widgetMode } })),
     }),
     {

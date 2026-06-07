@@ -49,18 +49,24 @@ export default function Settings({ isOpen, onClose }: { isOpen: boolean; onClose
 
                 <div>
                   <label className="block text-sm text-gray-400 mb-2">Accent Color</label>
-                  <div className="flex gap-2">
-                    {['cyan', 'purple', 'amber', 'red'].map((color) => (
-                      <button
-                        key={color}
-                        onClick={() => updateSettings({ accentColor: color as any })}
-                        className={`w-8 h-8 rounded-full border-2 transition-all ${
-                          settings.accentColor === color
-                            ? `border-${color}-500 scale-110`
-                            : 'border-transparent hover:scale-110'
-                        } bg-${color}-500`}
-                      />
-                    ))}
+                  <div className="flex gap-3">
+                    {(['cyan', 'purple', 'amber', 'red'] as const).map((color) => {
+                      const hex = { cyan: '#06b6d4', purple: '#a855f7', amber: '#f59e0b', red: '#ef4444' }[color]
+                      const active = settings.accentColor === color
+                      return (
+                        <button
+                          key={color}
+                          onClick={() => updateSettings({ accentColor: color })}
+                          className={`w-9 h-9 rounded-full border-2 transition-all ${active ? 'scale-110' : 'hover:scale-110'}`}
+                          style={{
+                            backgroundColor: hex,
+                            borderColor: active ? '#fff' : 'transparent',
+                            boxShadow: active ? `0 0 0 2px ${hex}` : 'none',
+                          }}
+                          title={color}
+                        />
+                      )
+                    })}
                   </div>
                 </div>
 
