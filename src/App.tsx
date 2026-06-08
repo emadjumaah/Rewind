@@ -18,10 +18,11 @@ import {
   Command,
   Sun,
   Moon,
+  X,
 } from "lucide-react";
 
 export default function App() {
-  const { settings, updateSettings, toggleFocusMode, setCommandPaletteOpen } =
+  const { settings, updateSettings, toggleFocusMode, setCommandPaletteOpen, toggleWidgetMode } =
     useStore();
   const T = useT();
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
@@ -37,6 +38,18 @@ export default function App() {
   useEffect(() => {
     document.documentElement.classList.toggle("dark", settings.darkMode);
   }, [settings.darkMode]);
+
+  // ⌘W exits widget mode from anywhere — CommandPalette isn't mounted in widget view
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'w') {
+        e.preventDefault();
+        toggleWidgetMode();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [toggleWidgetMode]);
 
   const toggleFullscreen = () => {
     if (!document.fullscreenElement) {
@@ -56,6 +69,13 @@ export default function App() {
       <div
         className={`fixed inset-0 ${isDark ? "bg-gray-950" : "bg-gray-50"} flex items-center justify-center p-4`}
       >
+        <button
+          onClick={toggleWidgetMode}
+          className="absolute top-4 right-4 text-gray-600 hover:text-gray-300 transition-colors"
+          title={T.widgetExit}
+        >
+          <X size={20} />
+        </button>
         <div className="glass-strong rounded-2xl p-6 max-w-sm w-full">
           <div className="aspect-square max-h-[50vh] mx-auto mb-4">
             <ReverseClock currentTime={currentTime} />
