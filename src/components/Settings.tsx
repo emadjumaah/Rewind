@@ -12,6 +12,19 @@ export default function Settings({ isOpen, onClose }: { isOpen: boolean; onClose
 
   const selectCls = 'w-full bg-white/10 border border-white/20 rounded-lg px-4 py-2 text-gray-200 focus:outline-none focus:border-blue-500/50'
 
+  const notificationsSupported = typeof Notification !== 'undefined'
+
+  const toggleNotifications = async () => {
+    if (settings.notifications) {
+      updateSettings({ notifications: false })
+      return
+    }
+    if (!notificationsSupported) return
+    let perm = Notification.permission
+    if (perm === 'default') perm = await Notification.requestPermission()
+    updateSettings({ notifications: perm === 'granted' })
+  }
+
   return (
     <AnimatePresence>
       {isOpen && (
@@ -52,6 +65,22 @@ export default function Settings({ isOpen, onClose }: { isOpen: boolean; onClose
                 </button>
               </div>
 
+              {/* Notifications */}
+              {notificationsSupported && (
+                <div>
+                  <label className="block text-sm text-gray-400 mb-2">{T.notifications}</label>
+                  <button
+                    onClick={toggleNotifications}
+                    className={`w-full px-4 py-2 rounded-lg transition-all ${
+                      settings.notifications ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30' : 'bg-white/5 text-gray-400 hover:bg-white/10'
+                    }`}
+                  >
+                    {settings.notifications ? T.enabled : T.disabled}
+                  </button>
+                  <p className="text-xs text-gray-500 mt-2 leading-relaxed">{T.notificationsHint}</p>
+                </div>
+              )}
+
               {/* Language */}
               <div>
                 <label className="block text-sm text-gray-400 mb-2">{T.language}</label>
@@ -77,7 +106,7 @@ export default function Settings({ isOpen, onClose }: { isOpen: boolean; onClose
                 <label className="block text-sm text-gray-400 mb-2">{T.accentColor}</label>
                 <div className="flex gap-3">
                   {(['cyan', 'purple', 'amber', 'red'] as const).map((color) => {
-                    const hex = { cyan: '#3b82f6', purple: '#a855f7', amber: '#f59e0b', red: '#ef4444' }[color]
+                    const hex = { cyan: '#2dd4bf', purple: '#8b5cf6', amber: '#f59e0b', red: '#f43f5e' }[color]
                     const active = settings.accentColor === color
                     return (
                       <button

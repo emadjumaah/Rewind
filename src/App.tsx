@@ -10,6 +10,7 @@ import Settings from "./components/Settings";
 import About from "./components/About";
 import { useStore } from "./store";
 import { useT } from "./i18n";
+import { useDeadlineNotifications } from "./hooks/useDeadlineNotifications";
 import {
   Maximize2,
   Settings as SettingsIcon,
@@ -25,6 +26,7 @@ export default function App() {
   const { settings, updateSettings, toggleFocusMode, setCommandPaletteOpen, toggleWidgetMode } =
     useStore();
   const T = useT();
+  useDeadlineNotifications();
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isAboutOpen, setIsAboutOpen] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
@@ -38,6 +40,14 @@ export default function App() {
   useEffect(() => {
     document.documentElement.classList.toggle("dark", settings.darkMode);
   }, [settings.darkMode]);
+
+  // Keep <html lang/dir> in sync so :lang(ar) font rules, a11y, and the whole
+  // layout (header, grid) mirror correctly in Arabic — not just text nodes.
+  useEffect(() => {
+    const lang = settings.language ?? "en";
+    document.documentElement.lang = lang;
+    document.documentElement.dir = lang === "ar" ? "rtl" : "ltr";
+  }, [settings.language]);
 
   // ⌘W exits widget mode from anywhere — CommandPalette isn't mounted in widget view
   useEffect(() => {

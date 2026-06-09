@@ -6,6 +6,7 @@ export interface Deadline {
   title: string
   deadline: Date
   estimatedHours: number
+  demo?: boolean
 }
 
 export interface Settings {
@@ -16,6 +17,7 @@ export interface Settings {
   widgetMode: boolean
   darkMode: boolean
   language: 'en' | 'ar'
+  notifications: boolean
 }
 
 interface AppState {
@@ -36,22 +38,25 @@ interface AppState {
 
 const demoDeadlines: Deadline[] = [
   {
-    id: '1',
+    id: 'demo-1',
     title: 'Q4 Report',
     deadline: new Date(Date.now() + 9 * 24 * 60 * 60 * 1000),
     estimatedHours: 20,
+    demo: true,
   },
   {
-    id: '2',
+    id: 'demo-2',
     title: 'Client Presentation',
     deadline: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
     estimatedHours: 40,
+    demo: true,
   },
   {
-    id: '3',
+    id: 'demo-3',
     title: 'Feature Launch',
     deadline: new Date(Date.now() + 20 * 60 * 60 * 1000),
     estimatedHours: 30,
+    demo: true,
   },
 ]
 
@@ -67,6 +72,7 @@ export const useStore = create<AppState>()(
         widgetMode: false,
         darkMode: true,
         language: 'en',
+        notifications: false,
       },
       isFocusMode: false,
       isCommandPaletteOpen: false,

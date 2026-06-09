@@ -22,6 +22,8 @@ interface Translations {
 
   // DeadlineCards
   deadlines: string
+  demoBadge: string
+  demoHint: string
   add: string
   addDeadlineTooltip: string
   addFirst: string
@@ -59,6 +61,14 @@ interface Translations {
   language: string
   english: string
   arabic: string
+  notifications: string
+  notificationsHint: string
+
+  // Notification bodies
+  notif72: (title: string) => string
+  notif24: (title: string) => string
+  notif1: (title: string) => string
+  notifOverdue: (title: string) => string
 
   // About
   aboutTitle: string
@@ -116,6 +126,8 @@ const en: Translations = {
   workHoursSubtext: 'Meetings will take half.',
 
   deadlines: 'Deadlines',
+  demoBadge: 'DEMO',
+  demoHint: 'Sample data — delete it and add your own.',
   add: 'Add',
   addDeadlineTooltip: 'Add deadline ⌘D',
   addFirst: '+ Add your first deadline',
@@ -151,6 +163,13 @@ const en: Translations = {
   language: 'Language',
   english: 'English',
   arabic: 'العربية',
+  notifications: 'Notifications',
+  notificationsHint: 'Reminders as deadlines close in. Only fire while the app is open.',
+
+  notif72: (t) => `${t}: 3 days out. Plenty of time to keep ignoring it.`,
+  notif24: (t) => `${t}: 24 hours left. Now it's real.`,
+  notif1: (t) => `${t}: 1 hour left. Hope you started.`,
+  notifOverdue: (t) => `${t}: overdue. It's a you problem now.`,
 
   aboutTitle: 'About Rewind',
   aboutP1: "The numbers are mirrored because the way we experience time is backwards — we think we have more than we do, until we don't.",
@@ -187,87 +206,96 @@ const en: Translations = {
 }
 
 const ar: Translations = {
-  appName: 'ريواند',
-  clockLabel: 'ريواند',
+  appName: 'Rewind',
+  clockLabel: 'REWIND',
 
-  timeRemainingToday: 'الوقت المتبقي اليوم',
+  timeRemainingToday: 'ما تبقّى من يومك',
   timeUnits: 'س · د · ث',
 
-  sectionTimeRemaining: 'الوقت المتبقي',
-  todayLeft: (h, m) => `تبقّى ${h}س ${m}د اليوم`,
-  todaySubtext: 'على الأرجح تحتاج ضعف ذلك.',
-  weekendsLeft: (n) => `${n} عطلة نهاية أسبوع هذا العام`,
-  weekendsSubtext: 'خطط لذلك. أو لا.',
-  yearGone: (pct, year) => `${pct}% من عام ${year} انقضى`,
-  yearSubtext: 'التقدم: قابل للجدل.',
-  workHoursLeft: (h) => `تبقّى ${h} ساعة عمل هذا الأسبوع`,
-  workHoursSubtext: 'الاجتماعات ستأخذ نصفها.',
+  sectionTimeRemaining: 'ما تبقّى',
+  todayLeft: (h, m) => `بقي من يومك ${h} ساعة و${m} دقيقة`,
+  todaySubtext: 'وتحتاج ضعفها، كالعادة.',
+  weekendsLeft: (n) => `بقيت ${n} عطلة نهاية أسبوع هذا العام`,
+  weekendsSubtext: 'اغتنمها… أو دعها تمرّ كغيرها.',
+  yearGone: (pct, year) => `مضى ${pct}٪ من عام ${year}`,
+  yearSubtext: 'وأنت لا تزال كما أنت.',
+  workHoursLeft: (h) => `بقي ${h} ساعة عمل هذا الأسبوع`,
+  workHoursSubtext: 'وستلتهم الاجتماعات نصفها.',
 
-  deadlines: 'المواعيد النهائية',
+  deadlines: 'المواعيد',
+  demoBadge: 'للعرض',
+  demoHint: 'بيانات تجريبية للعرض — احذفها وأضف مواعيدك.',
   add: 'إضافة',
   addDeadlineTooltip: 'إضافة موعد ⌘D',
   addFirst: '+ أضف موعدك الأول',
-  addAnother: '+ إضافة موعد آخر',
-  overdue: (d) => `متأخر ${d} يوم. هذه مشكلتك الآن.`,
-  urgentCritical: (h, e) => `تبقّى ${h} ساعة. تحتاج ${e}. لن يحدث هذا.`,
-  urgentHigh: (d, h, e) => `${d} أيام و${h} ساعة. تحتاج ${e}. هذه مشكلتك.`,
-  urgentMedium: (d, e, wh) => `${d} أيام. تحتاج ${e} ساعة. لديك ${wh} ساعة عمل. حظاً موفقاً.`,
-  normal: (d, e) => `${d} أيام. تحتاج ${e} ساعة. لا بأس. ربما.`,
+  addAnother: '+ أضف موعداً آخر',
+  overdue: (d) => `فات موعده بـ${d} يوم. تدبّر أمرك الآن.`,
+  urgentCritical: (h, e) => `${h} ساعة فقط، وتحتاج ${e}. لن تُنجزه.`,
+  urgentHigh: (d, h, e) => `${d} يوم و${h} ساعة، وتحتاج ${e}. ابدأ الآن أو انسَ الأمر.`,
+  urgentMedium: (d, e, wh) => `${d} يوم، تحتاج ${e} ساعة ولا تملك سوى ${wh}. بالتوفيق.`,
+  normal: (d, e) => `${d} يوم وتحتاج ${e} ساعة. الوقت يكفي… نظرياً.`,
 
-  addDeadline: 'إضافة موعد نهائي',
-  editDeadline: 'تعديل الموعد النهائي',
+  addDeadline: 'إضافة موعد',
+  editDeadline: 'تعديل الموعد',
   titleLabel: 'العنوان',
-  deadlineLabel: 'الموعد النهائي',
-  estimatedHours: 'الساعات التقديرية',
+  deadlineLabel: 'الموعد',
+  estimatedHours: 'الساعات المقدّرة',
   cancel: 'إلغاء',
-  update: 'تحديث',
-  deadlinePlaceholder: 'ما الذي لن تنهيه؟',
+  update: 'حفظ',
+  deadlinePlaceholder: 'ما الذي لن تنجزه هذه المرة؟',
 
   settings: 'الإعدادات',
   darkMode: 'الوضع الليلي',
-  enabled: 'مفعّل',
-  disabled: 'معطّل',
-  accentColor: 'اللون الأساسي',
+  enabled: 'مُفعّل',
+  disabled: 'مُعطّل',
+  accentColor: 'اللون المميّز',
   motionIntensity: 'شدّة الحركة',
-  low: 'منخفض',
-  medium: 'متوسط',
-  high: 'مرتفع',
-  timeFormat: 'تنسيق الوقت',
+  low: 'خفيفة',
+  medium: 'متوسطة',
+  high: 'عالية',
+  timeFormat: 'صيغة الوقت',
   twelveHour: '12 ساعة',
   twentyFourHour: '24 ساعة',
-  focusLength: 'مدة جلسة التركيز (دقائق)',
+  focusLength: 'مدة جلسة التركيز (بالدقائق)',
   language: 'اللغة',
   english: 'English',
   arabic: 'العربية',
+  notifications: 'التنبيهات',
+  notificationsHint: 'تذكيرات كلما اقترب موعد. لا تظهر إلا والتطبيق مفتوح.',
 
-  aboutTitle: 'عن ريواند',
-  aboutP1: 'الأرقام معكوسة لأن طريقتنا في تجربة الوقت معكوسة — نظن أن لدينا وقتاً أكثر مما لدينا، حتى لا يكون كذلك.',
-  aboutP2: 'ريواند يتتبع ما تبقّى، لا ما مضى. الساعة تسير عكس المعتاد لأن إدراكنا للوقت مقلوب: دائماً نفترض أن هناك المزيد، حتى يأتي يوم لا يكون.',
-  aboutFooter: 'مبني بأدوات حديثة لتتبع مشاكل قديمة.',
+  notif72: (t) => `${t}: ثلاثة أيام تفصلك عنه. وقتٌ كافٍ لتتجاهله أكثر.`,
+  notif24: (t) => `${t}: 24 ساعة، وصار الأمر جدّياً.`,
+  notif1: (t) => `${t}: ساعة واحدة. أرجو أنك بدأت.`,
+  notifOverdue: (t) => `${t}: فات موعده. تدبّر أمرك.`,
+
+  aboutTitle: 'عن Rewind',
+  aboutP1: 'الأرقام مقلوبة لأن إحساسنا بالوقت مقلوب — نظنّ أن أمامنا متّسعاً، إلى أن ينفد.',
+  aboutP2: 'يقيس Rewind ما بقي، لا ما مضى. تدور عقاربه عكس المعتاد لأننا دائماً نفترض أن في العمر بقيّة، حتى يأتي يوم لا بقيّة فيه.',
+  aboutFooter: 'صُنع بأدوات حديثة لقياس همٍّ قديم.',
 
   cmdTitle: '⌘ الأوامر',
-  cmdFocusLabel: 'بدء وضع التركيز',
+  cmdFocusLabel: 'ابدأ وضع التركيز',
   cmdFocusDesc: 'بلا أعذار.',
-  cmdAddLabel: 'إضافة موعد نهائي',
-  cmdAddDesc: 'شيء آخر على الأرجح لن تنهيه.',
+  cmdAddLabel: 'إضافة موعد',
+  cmdAddDesc: 'مهمّة أخرى لن تُكملها على الأرجح.',
   cmdOpenSettings: 'فتح الإعدادات',
-  cmdOpenSettingsDesc: 'غيّر المظهر. ليس الموعد النهائي.',
+  cmdOpenSettingsDesc: 'غيّر المظهر، لا الموعد.',
   cmdLightMode: 'التبديل للوضع النهاري',
   cmdDarkMode: 'التبديل للوضع الليلي',
-  cmdLightModeDesc: 'للناس الذين يحبون الرؤية.',
-  cmdDarkModeDesc: 'لتأمل إخفاقاتك في الظلام.',
+  cmdLightModeDesc: 'لمن يفضّل أن يرى ما ينتظره.',
+  cmdDarkModeDesc: 'لتتأمّل إخفاقاتك في العتمة.',
   cmdWidgetMode: 'وضع الأداة',
   cmdExitWidget: 'الخروج من وضع الأداة',
-  cmdWidgetDesc: 'لشاشتك الثانية. مسرح الإنتاجية المزدوج.',
-  cmdExitWidgetDesc: 'عودة للشعور الكامل بالذنب.',
-  cmdClearAll: 'مسح كل المواعيد النهائية',
-  cmdClearDesc: 'لا تختفي. فقط تتوقف عن النظر إليها.',
+  cmdWidgetDesc: 'لشاشتك الثانية. عرضٌ مزدوج لإنتاجيةٍ وهمية.',
+  cmdExitWidgetDesc: 'عُد إلى الشعور الكامل بالذنب.',
+  cmdClearAll: 'مسح كل المواعيد',
+  cmdClearDesc: 'لن تختفي، لكنك ستكفّ عن النظر إليها.',
   cmdReset: 'إعادة ضبط الإعدادات',
-  cmdResetDesc: 'بداية جديدة ستبددها بنفس الطريقة.',
+  cmdResetDesc: 'بدايةٌ جديدة ستبدّدها كسابقتها.',
 
-  focusPrompt: (min) => `${min} دقيقة. بلا أعذار. سنرى.`,
-  focusDone: 'انتهيت. أو استسلمت. على أي حال، الوقت مضى.',
-  focusPause: 'إيقاف مؤقت',
+  focusPrompt: (min) => `${min} دقيقة. بلا أعذار. لنرَ.`,
+  focusDone: 'انتهيت، أو استسلمت. المهم أن الوقت مضى.',
+  focusPause: 'إيقاف',
   focusStart: 'ابدأ',
 
   widgetMode: 'وضع الأداة',

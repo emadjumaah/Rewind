@@ -74,7 +74,7 @@ function DeadlineCard({
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
-      whileHover={{ scale: 1.01 }}
+      whileHover={{ scale: 1.015 }}
       whileTap={{ scale: 0.99 }}
       className={`glass rounded-xl p-3 relative ${getUrgencyColor(deadlineDate)}`}
     >
@@ -119,9 +119,16 @@ function DeadlineCard({
         </div>
 
         <div className="flex-1 min-w-0 pr-5">
-          <h3 className="text-sm font-semibold mb-1 tracking-tight truncate">
-            {deadline.title}
-          </h3>
+          <div className="flex items-center gap-1.5 mb-1">
+            <h3 className="text-sm font-semibold tracking-tight truncate">
+              {deadline.title}
+            </h3>
+            {deadline.demo && (
+              <span className="shrink-0 text-[8px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded border border-white/20 bg-white/10 text-gray-400">
+                {T.demoBadge}
+              </span>
+            )}
+          </div>
           <p className="text-gray-400 text-xs leading-relaxed">
             {getUrgencyText(deadlineDate, deadline.estimatedHours, currentTime, T)}
           </p>
@@ -188,6 +195,10 @@ function DeadlineCards({ currentTime }: { currentTime: Date }) {
         </button>
       </div>
 
+      {deadlines.some((d) => d.demo) && (
+        <p className="text-[10px] text-gray-500 shrink-0 -mt-1 px-1">{T.demoHint}</p>
+      )}
+
       {deadlines.length === 0 ? (
         <button
           onClick={handleAdd}
@@ -197,7 +208,7 @@ function DeadlineCards({ currentTime }: { currentTime: Date }) {
         </button>
       ) : (
         /* Scrollable list — fills remaining height on desktop, natural flow on mobile */
-        <div className="deadline-list grid gap-2 md:overflow-y-auto md:flex-1 md:min-h-0 md:pr-0.5">
+        <div className="deadline-list grid gap-2.5 md:overflow-y-auto md:flex-1 md:min-h-0 px-2 py-1">
           {deadlines.map((deadline) => (
             <DeadlineCard
               key={deadline.id}

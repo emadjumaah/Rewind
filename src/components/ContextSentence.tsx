@@ -258,7 +258,7 @@ function ContextSentence({ currentTime }: { currentTime: Date }) {
         className="text-sm text-gray-400 text-center leading-relaxed italic"
         dir={isAr ? 'rtl' : 'ltr'}
         lang={isAr ? 'ar' : 'en'}
-        style={isAr ? { fontFamily: 'system-ui, -apple-system, sans-serif', fontStyle: 'normal' } : undefined}
+        style={isAr ? { fontStyle: 'normal' } : undefined}
       >
         {context}
       </p>

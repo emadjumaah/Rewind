@@ -5,9 +5,18 @@
 @layer base {
   body {
     @apply antialiased;
-    font-family: 'Space Grotesk', sans-serif;
+    /* Latin glyphs resolve to Space Grotesk; Arabic glyphs fall through to
+       IBM Plex Sans Arabic so the whole app uses one consistent Arabic face. */
+    font-family: 'Space Grotesk', 'IBM Plex Sans Arabic', sans-serif;
     background-color: #f9fafb; /* gray-50 */
     color: #111827;            /* gray-900 */
+  }
+
+  /* Force the dedicated Arabic face whenever content is Arabic / RTL,
+     regardless of which component renders it. */
+  :lang(ar),
+  [dir='rtl'] {
+    font-family: 'IBM Plex Sans Arabic', 'Space Grotesk', sans-serif;
   }
 
   html.dark body {
