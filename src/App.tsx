@@ -12,6 +12,9 @@ import LifeInWeeks from "./components/LifeInWeeks";
 import { useStore } from "./store";
 import { useT } from "./i18n";
 import { useDeadlineNotifications } from "./hooks/useDeadlineNotifications";
+import { accentHex } from "./lib/colors";
+import { yearElapsed } from "./lib/time";
+import { drawShareCard, shareCard } from "./lib/shareCard";
 import {
   Maximize2,
   Settings as SettingsIcon,
@@ -22,6 +25,10 @@ import {
   Moon,
   X,
   LayoutGrid,
+  Share2,
+  MoreHorizontal,
+  Languages,
+  Monitor,
 } from "lucide-react";
 
 export default function App() {
@@ -38,7 +45,37 @@ export default function App() {
   useDeadlineNotifications();
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isAboutOpen, setIsAboutOpen] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
+
+  const lang = settings.language ?? "en";
+
+  const handleShare = async () => {
+    const accent = accentHex(settings.accentColor);
+    let bigStat: string, statLabel: string, caption: string;
+    if (settings.birthDate) {
+      const total = (settings.lifeExpectancy || 90) * 52;
+      const lived = Math.min(
+        total,
+        Math.floor((Date.now() - new Date(settings.birthDate).getTime()) / (7 * 86_400_000)),
+      );
+      const left = Math.max(0, total - lived);
+      bigStat = left.toLocaleString(lang);
+      statLabel = lang === "ar" ? "أسبوع باقٍ" : "weeks left";
+      caption = T.shareWeeksLine(left);
+    } else {
+      const pct = Math.round(yearElapsed(new Date()) * 100);
+      bigStat = `${pct}%`;
+      statLabel = lang === "ar" ? "من العام مضى" : "of the year, gone";
+      caption = T.shareSocialDesc;
+    }
+    const canvas = drawShareCard({ accent, bigStat, statLabel, caption, rtl: lang === "ar" });
+    await shareCard(canvas, {
+      title: T.shareSocialTitle,
+      text: caption,
+      url: "https://rewind.uts.qa",
+    });
+  };
 
   useEffect(() => {
     const interval = setInterval(() => setCurrentTime(new Date()), 1000);
@@ -130,53 +167,13 @@ export default function App() {
             {T.appName}
           </h1>
           <div className="flex items-center gap-3 md:gap-4">
-            <button
-              onClick={() => setCommandPaletteOpen(true)}
-              className={btnCls}
-              title="Commands ⌘K"
-            >
-              <Command size={18} />
-            </button>
-            <button
-              onClick={() => setIsAboutOpen(true)}
-              className={btnCls}
-              title="About"
-            >
-              <Info size={18} />
-            </button>
-            <button
-              onClick={() => setLifeWeeksOpen(true)}
-              className={btnCls}
-              title={T.lifeWeeks}
-            >
+            {/* Primary actions */}
+            <button onClick={() => setLifeWeeksOpen(true)} className={btnCls} title={T.lifeWeeks}>
               <LayoutGrid size={18} />
             </button>
-            <button
-              onClick={toggleFocusMode}
-              className={btnCls}
-              title="Focus Mode"
-            >
-              <Clock size={18} />
+            <button onClick={handleShare} className={btnCls} title={T.share}>
+              <Share2 size={18} />
             </button>
-
-            {/* Language toggle */}
-            <button
-              onClick={() =>
-                updateSettings({
-                  language: settings.language === "ar" ? "en" : "ar",
-                })
-              }
-              className={`${btnCls} text-[11px] font-bold tracking-widest leading-none w-7 text-center`}
-              title={
-                settings.language === "ar"
-                  ? "Switch to English"
-                  : "التبديل للعربية"
-              }
-            >
-              {settings.language === "ar" ? "EN" : "ع"}
-            </button>
-
-            {/* Dark / light toggle */}
             <button
               onClick={() => updateSettings({ darkMode: !settings.darkMode })}
               className={btnCls}
@@ -184,21 +181,43 @@ export default function App() {
             >
               {isDark ? <Sun size={17} /> : <Moon size={17} />}
             </button>
-
-            <button
-              onClick={toggleFullscreen}
-              className={`${btnCls} hidden md:block`}
-              title="Fullscreen"
-            >
-              <Maximize2 size={18} />
-            </button>
-            <button
-              onClick={() => setIsSettingsOpen(true)}
-              className={btnCls}
-              title="Settings"
-            >
+            <button onClick={() => setIsSettingsOpen(true)} className={btnCls} title={T.settings}>
               <SettingsIcon size={18} />
             </button>
+
+            {/* Overflow menu — secondary actions tucked away to keep it clean */}
+            <div className="relative">
+              <button onClick={() => setIsMenuOpen((o) => !o)} className={btnCls} title="More">
+                <MoreHorizontal size={18} />
+              </button>
+              {isMenuOpen && (
+                <>
+                  <div className="fixed inset-0 z-20" onClick={() => setIsMenuOpen(false)} />
+                  <div
+                    className="absolute z-30 mt-2 end-0 min-w-[190px] glass-strong rounded-xl p-1.5 shadow-2xl"
+                    dir={lang === "ar" ? "rtl" : "ltr"}
+                  >
+                    {[
+                      { icon: <Command size={16} />, label: T.cmdTitle, onClick: () => setCommandPaletteOpen(true) },
+                      { icon: <Clock size={16} />, label: T.cmdFocusLabel, onClick: toggleFocusMode },
+                      { icon: <Monitor size={16} />, label: settings.widgetMode ? T.cmdExitWidget : T.cmdWidgetMode, onClick: toggleWidgetMode },
+                      { icon: <Maximize2 size={16} />, label: lang === "ar" ? "ملء الشاشة" : "Fullscreen", onClick: toggleFullscreen },
+                      { icon: <Languages size={16} />, label: lang === "ar" ? T.english : T.arabic, onClick: () => updateSettings({ language: lang === "ar" ? "en" : "ar" }) },
+                      { icon: <Info size={16} />, label: T.aboutTitle, onClick: () => setIsAboutOpen(true) },
+                    ].map((item, i) => (
+                      <button
+                        key={i}
+                        onClick={() => { item.onClick(); setIsMenuOpen(false); }}
+                        className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-start transition-colors ${isDark ? "text-gray-300 hover:bg-white/10" : "text-gray-700 hover:bg-black/5"}`}
+                      >
+                        <span className="text-gray-500">{item.icon}</span>
+                        {item.label}
+                      </button>
+                    ))}
+                  </div>
+                </>
+              )}
+            </div>
           </div>
         </div>
 

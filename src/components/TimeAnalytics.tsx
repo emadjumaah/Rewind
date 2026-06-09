@@ -1,5 +1,6 @@
 import React from 'react'
 import { useT } from '../i18n'
+import DrainCircle from './DrainCircle'
 import { msLeftToday, hms, weekendsLeftInYear, yearElapsed, workHoursLeftThisWeek } from '../lib/time'
 
 function TimeAnalytics({ currentTime }: { currentTime: Date }) {
@@ -45,47 +46,22 @@ function TimeAnalytics({ currentTime }: { currentTime: Date }) {
       <h2 className="text-sm font-semibold text-gray-300 tracking-wide uppercase">{T.sectionTimeRemaining}</h2>
       <div className="grid grid-cols-2 gap-2">
         {analytics.map((item, index) => {
-          const circumference = 2 * Math.PI * 28
-          const strokeDashoffset = circumference * (1 - Math.max(0, Math.min(1, item.progress)))
           const ringColor = getRingColor(item.progress)
-
+          const pct = Math.round(Math.max(0, Math.min(1, item.progress)) * 100)
           return (
-            <div key={index} className="glass rounded-lg p-3 flex flex-col items-center">
-              <div className="relative mb-2">
-                <svg className="w-16 h-16" viewBox="0 0 60 60">
-                  <defs>
-                    <radialGradient id={`ag-${index}`} cx="50%" cy="50%" r="50%">
-                      <stop offset="0%" stopColor={ringColor} stopOpacity="0.2" />
-                      <stop offset="100%" stopColor={ringColor} stopOpacity="0" />
-                    </radialGradient>
-                  </defs>
-                  <circle cx="30" cy="30" r="28" fill={`url(#ag-${index})`} />
-                  <circle cx="30" cy="30" r="28" fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="3" />
-                  <circle
-                    cx="30" cy="30" r="28"
-                    fill="none"
-                    stroke={ringColor}
-                    strokeWidth="3"
-                    strokeLinecap="round"
-                    strokeDasharray={circumference}
-                    strokeDashoffset={strokeDashoffset}
-                    style={{
-                      transform: 'scaleX(-1) rotate(-90deg)',
-                      transformOrigin: '30px 30px',
-                      transition: 'stroke-dashoffset 1s linear',
-                    }}
-                  />
-                </svg>
+            <div key={index} className="glass rounded-lg p-2.5 flex items-center gap-2.5">
+              <div className="relative shrink-0 w-11 h-11">
+                <DrainCircle size={44} progress={item.progress} color={ringColor} />
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="text-xs font-semibold tabular-nums">
-                    {Math.round(item.progress * 100)}%
+                  <span className="text-[10px] font-semibold tabular-nums text-white" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.5)' }}>
+                    {pct}%
                   </span>
                 </div>
               </div>
-              <span className="text-gray-200 text-xs font-medium tracking-tight text-center leading-tight">
-                {item.label}
-              </span>
-              <p className="text-gray-500 text-[10px] text-center mt-1 leading-snug">{item.subtext}</p>
+              <div className="min-w-0">
+                <p className="text-gray-200 text-xs font-medium leading-tight">{item.label}</p>
+                <p className="text-gray-500 text-[10px] leading-snug mt-0.5">{item.subtext}</p>
+              </div>
             </div>
           )
         })}

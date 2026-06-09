@@ -5,6 +5,7 @@ import { useT, useDir } from "../i18n";
 import { differenceInDays, differenceInHours } from "date-fns";
 import { X, Plus, Edit } from "lucide-react";
 import DeadlineModal from "./DeadlineModal";
+import DrainCircle from "./DrainCircle";
 import { urgencyCardClasses, urgencyColor } from "../lib/urgency";
 
 function getUrgencyText(deadline: Deadline, currentTime: Date, T: ReturnType<typeof useT>): string {
@@ -52,8 +53,6 @@ function DeadlineCard({
   const hoursLeft = differenceInHours(deadlineDate, currentTime);
   const daysLeft = differenceInDays(deadlineDate, currentTime);
   const progress = Math.max(0, Math.min(1, hoursLeft / totalHours));
-  const circumference = 2 * Math.PI * 45;
-  const strokeDashoffset = circumference * (1 - progress);
   const ringColor = urgencyColor(hoursLeft);
   const isOverdue = hoursLeft < 0;
 
@@ -74,35 +73,10 @@ function DeadlineCard({
       </button>
 
       <div className="flex items-start gap-3">
-        <div className="relative shrink-0">
-          <svg className="w-16 h-16" viewBox="0 0 100 100">
-            <defs>
-              <radialGradient id={`ug-${deadline.id}`} cx="50%" cy="50%" r="50%">
-                <stop offset="0%" stopColor={ringColor} stopOpacity="0.3" />
-                <stop offset="100%" stopColor={ringColor} stopOpacity="0" />
-              </radialGradient>
-            </defs>
-            <circle cx="50" cy="50" r="45" fill={`url(#ug-${deadline.id})`} />
-            <circle cx="50" cy="50" r="45" fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth="4" />
-            <circle
-              cx="50" cy="50" r="45"
-              fill="none"
-              stroke={ringColor}
-              strokeWidth="4"
-              strokeLinecap="round"
-              strokeDasharray={circumference}
-              strokeDashoffset={strokeDashoffset}
-              style={{
-                // mirror, then rotate start to 12 o'clock, so it depletes
-                // counter-clockwise from the top — matching the clock ring
-                transform: "scaleX(-1) rotate(-90deg)",
-                transformOrigin: "50px 50px",
-                transition: "stroke-dashoffset 1s ease-out",
-              }}
-            />
-          </svg>
+        <div className="relative shrink-0 w-16 h-16">
+          <DrainCircle size={64} progress={progress} color={ringColor} />
           <div className="absolute inset-0 flex items-center justify-center">
-            <span className={`text-sm font-semibold tabular-nums ${isOverdue ? 'text-red-400' : ''}`}>
+            <span className="text-sm font-semibold tabular-nums text-white" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.5)' }}>
               {isOverdue ? `+${Math.abs(daysLeft)}d` : `${daysLeft}d`}
             </span>
           </div>

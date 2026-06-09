@@ -168,17 +168,17 @@ export default function ReverseClock({ currentTime }: { currentTime: Date }) {
         </text>
       </svg>
 
-      {/* Nearest-deadline countdown — pinned to the bottom rim, below the hands'
-          reach (they only span ~77% of the radius) so it never overlaps them */}
+      {/* Nearest-deadline countdown — a quiet pill on the bottom rim, below the
+          hands' reach (~77% of radius) so it never overlaps them */}
       {deadlineLabel && (
-        <div className="absolute left-1/2 -translate-x-1/2 bottom-[1%] pointer-events-none">
+        <div
+          className="absolute left-1/2 -translate-x-1/2 bottom-[3%] pointer-events-none flex items-center gap-1.5 px-2.5 py-1 rounded-full"
+          style={{ backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.045)' }}
+        >
+          <span className="w-1.5 h-1.5 rounded-full" style={{ background: urgencyColor(nearest!.hoursLeft) }} />
           <span
-            className="px-2 py-0.5 rounded-full text-[10px] font-semibold tabular-nums tracking-wide"
-            style={{
-              color: urgencyColor(nearest!.hoursLeft),
-              backgroundColor: isDark ? 'rgba(6,6,16,0.8)' : 'rgba(245,245,240,0.9)',
-              border: `1px solid ${urgencyColor(nearest!.hoursLeft)}55`,
-            }}
+            className="text-[10px] font-medium tabular-nums tracking-wider"
+            style={{ color: urgencyColor(nearest!.hoursLeft) }}
           >
             {deadlineLabel}
           </span>
