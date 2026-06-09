@@ -33,6 +33,9 @@ interface Translations {
   urgentHigh: (d: number, h: number, e: number) => string
   urgentMedium: (d: number, e: number, wh: number) => string
   normal: (d: number, e: number) => string
+  lifePassed: (d: number) => string
+  lifeToday: () => string
+  lifeAway: (d: number) => string
 
   // DeadlineModal
   addDeadline: string
@@ -43,6 +46,34 @@ interface Translations {
   cancel: string
   update: string
   deadlinePlaceholder: string
+  categoryLabel: string
+  categoryWork: string
+  categoryLife: string
+  lifeTitlePlaceholder: string
+  lifePresetBirthday: string
+  lifePresetTrip: string
+  lifePresetMilestone: string
+
+  // Life in Weeks
+  lifeWeeks: string
+  lifeWeeksIntro: string
+  lifeWeeksSetup: string
+  birthDateLabel: string
+  lifeExpectancyLabel: string
+  lifeWeeksLived: (n: number) => string
+  lifeWeeksLeft: (n: number) => string
+  lifeWeeksSpent: (p: string) => string
+  weekendsLeftBig: (n: number) => string
+  save: string
+  share: string
+
+  // Share
+  shareSocialTitle: string
+  shareSocialDesc: string
+  shareWeeksLine: (n: number) => string
+  shareCopied: string
+  cmdLifeWeeks: string
+  cmdLifeWeeksDesc: string
 
   // Settings
   settings: string
@@ -137,6 +168,9 @@ const en: Translations = {
   urgentHigh: (d, h, e) => `${d} days, ${h}h left. You need ${e}h. This is a you problem.`,
   urgentMedium: (d, e, wh) => `${d} days left. You need ${e}h. You have ${wh}h work hours. Good luck.`,
   normal: (d, e) => `${d} days left. You need ${e}h. This is fine. Probably.`,
+  lifePassed: (d) => `${d} days ago. It came and went.`,
+  lifeToday: () => `Today. This is the day. Right now.`,
+  lifeAway: (d) => `${d} days away. Closer than it feels.`,
 
   addDeadline: 'Add Deadline',
   editDeadline: 'Edit Deadline',
@@ -146,6 +180,32 @@ const en: Translations = {
   cancel: 'Cancel',
   update: 'Update',
   deadlinePlaceholder: "What won't you finish?",
+  categoryLabel: 'Type',
+  categoryWork: 'Work',
+  categoryLife: 'Life',
+  lifeTitlePlaceholder: 'A moment worth counting toward',
+  lifePresetBirthday: 'A birthday',
+  lifePresetTrip: 'A trip',
+  lifePresetMilestone: 'A milestone',
+
+  lifeWeeks: 'Life in Weeks',
+  lifeWeeksIntro: 'Each dot is one week. The filled ones are gone. This is the honest picture.',
+  lifeWeeksSetup: 'Enter your birth date to see your life, week by week.',
+  birthDateLabel: 'Birth date',
+  lifeExpectancyLabel: 'Life expectancy (years)',
+  lifeWeeksLived: (n) => `${n.toLocaleString()} weeks lived`,
+  lifeWeeksLeft: (n) => `${n.toLocaleString()} weeks left`,
+  lifeWeeksSpent: (p) => `${p}% spent`,
+  weekendsLeftBig: (n) => `${n.toLocaleString()} weekends left`,
+  save: 'Save',
+  share: 'Share',
+
+  shareSocialTitle: 'Rewind — time, honestly.',
+  shareSocialDesc: 'A backward clock and an honest look at the time you have left. Watch it go.',
+  shareWeeksLine: (n) => `I have about ${n.toLocaleString()} weeks left. What are you doing with yours?`,
+  shareCopied: 'Copied',
+  cmdLifeWeeks: 'Life in Weeks',
+  cmdLifeWeeksDesc: 'See your whole life, one dot per week.',
 
   settings: 'Settings',
   darkMode: 'Dark Mode',
@@ -234,6 +294,9 @@ const ar: Translations = {
   urgentHigh: (d, h, e) => `${d} يوم و${h} ساعة، وتحتاج ${e}. ابدأ الآن أو انسَ الأمر.`,
   urgentMedium: (d, e, wh) => `${d} يوم، تحتاج ${e} ساعة ولا تملك سوى ${wh}. بالتوفيق.`,
   normal: (d, e) => `${d} يوم وتحتاج ${e} ساعة. الوقت يكفي… نظرياً.`,
+  lifePassed: (d) => `قبل ${d} يوم. جاء ومضى.`,
+  lifeToday: () => `اليوم. هو هذا اليوم. الآن.`,
+  lifeAway: (d) => `بعد ${d} يوم. أقرب مما تشعر.`,
 
   addDeadline: 'إضافة موعد',
   editDeadline: 'تعديل الموعد',
@@ -243,6 +306,32 @@ const ar: Translations = {
   cancel: 'إلغاء',
   update: 'حفظ',
   deadlinePlaceholder: 'ما الذي لن تنجزه هذه المرة؟',
+  categoryLabel: 'النوع',
+  categoryWork: 'عمل',
+  categoryLife: 'حياة',
+  lifeTitlePlaceholder: 'لحظة تستحق أن تُعَدّ الأيام إليها',
+  lifePresetBirthday: 'عيد ميلاد',
+  lifePresetTrip: 'رحلة',
+  lifePresetMilestone: 'محطّة',
+
+  lifeWeeks: 'العمر بالأسابيع',
+  lifeWeeksIntro: 'كل نقطة أسبوع. الممتلئة منها مضت. هذه هي الصورة الصادقة.',
+  lifeWeeksSetup: 'أدخل تاريخ ميلادك لترى عمرك، أسبوعاً أسبوعاً.',
+  birthDateLabel: 'تاريخ الميلاد',
+  lifeExpectancyLabel: 'العمر المتوقّع (سنوات)',
+  lifeWeeksLived: (n) => `${n.toLocaleString('ar')} أسبوع مضى`,
+  lifeWeeksLeft: (n) => `${n.toLocaleString('ar')} أسبوع باقٍ`,
+  lifeWeeksSpent: (p) => `انقضى ${p}٪`,
+  weekendsLeftBig: (n) => `${n.toLocaleString('ar')} عطلة نهاية أسبوع باقية`,
+  save: 'حفظ',
+  share: 'مشاركة',
+
+  shareSocialTitle: 'Rewind — الوقت، بصدق.',
+  shareSocialDesc: 'ساعة تسير إلى الوراء ونظرة صادقة لما تبقّى من وقتك. شاهده يمضي.',
+  shareWeeksLine: (n) => `بقي لي نحو ${n.toLocaleString('ar')} أسبوع. وأنت، بماذا تقضي أسابيعك؟`,
+  shareCopied: 'نُسخ',
+  cmdLifeWeeks: 'العمر بالأسابيع',
+  cmdLifeWeeksDesc: 'انظر إلى عمرك كله، نقطة لكل أسبوع.',
 
   settings: 'الإعدادات',
   darkMode: 'الوضع الليلي',

@@ -1,20 +1,9 @@
+import { useMemo } from 'react'
 import { useStore } from '../store'
 import { useT } from '../i18n'
-
-const ACCENT_HEX: Record<string, string> = {
-  cyan:   '#2dd4bf', // teal
-  purple: '#8b5cf6', // violet
-  amber:  '#f59e0b', // amber
-  red:    '#f43f5e', // rose
-}
-
-// Urgency color, shared thresholds with the deadline cards
-function urgencyColor(hoursLeft: number): string {
-  if (hoursLeft < 0)   return '#dc2626'
-  if (hoursLeft < 24)  return '#ef4444'
-  if (hoursLeft < 72)  return '#f59e0b'
-  return '#3b82f6'
-}
+import { accentHex } from '../lib/colors'
+import { urgencyColor } from '../lib/urgency'
+import { dayRemaining, hoursUntil } from '../lib/time'
 
 // A point on a circle, angle measured clockwise from 12 o'clock
 function clockPoint(cx: number, deg: number, r: number): { x: number; y: number } {
@@ -32,7 +21,7 @@ export default function ReverseClock({ currentTime }: { currentTime: Date }) {
     if (!deadlines.length) return null
     const withLeft = deadlines.map((d) => {
       const date = d.deadline instanceof Date ? d.deadline : new Date(d.deadline)
-      return { d, date, hoursLeft: (date.getTime() - currentTime.getTime()) / 3_600_000 }
+      return { d, date, hoursLeft: hoursUntil(date, currentTime) }
     })
     const upcoming = withLeft.filter((x) => x.hoursLeft >= 0).sort((a, b) => a.hoursLeft - b.hoursLeft)
     if (upcoming.length) return upcoming[0]
@@ -40,7 +29,7 @@ export default function ReverseClock({ currentTime }: { currentTime: Date }) {
   })()
 
   const isDark = settings.darkMode
-  const accent = ACCENT_HEX[settings.accentColor]
+  const accent = accentHex(settings.accentColor)
 
   const sec = currentTime.getSeconds()
   const min = currentTime.getMinutes()
@@ -75,78 +64,91 @@ export default function ReverseClock({ currentTime }: { currentTime: Date }) {
   const LABELS = [12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1]
   const labelR = R - 22
 
-  // ── Nearest-deadline ring ── depletes counter-clockwise from 12 o'clock over
-  // a 30-day window, mirroring the reverse-clock motif: time only runs out.
+  // Tick marks and hour numbers are static — they only change with the theme,
+  // so memoize them and skip rebuilding ~72 nodes on every per-second tick.
+  const ticks = useMemo(() => Array.from({ length: 60 }, (_, i) => {
+    const a = (i * 6 - 90) * (Math.PI / 180)
+    const major = i % 5 === 0
+    const r1 = major ? R - 13 : R - 6
+    return (
+      <line key={i}
+        x1={cx + r1 * Math.cos(a)} y1={cx + r1 * Math.sin(a)}
+        x2={cx + R * Math.cos(a)} y2={cx + R * Math.sin(a)}
+        stroke={major ? tickMajor : tickMinor}
+        strokeWidth={major ? 1.6 : 0.8}
+      />
+    )
+  }), [tickMajor, tickMinor])
+
+  const labels = useMemo(() => LABELS.map((num, i) => {
+    const a = (i * 30 - 90) * (Math.PI / 180)
+    return (
+      <text key={num}
+        x={cx + labelR * Math.cos(a)}
+        y={cx + labelR * Math.sin(a)}
+        textAnchor="middle" dominantBaseline="central"
+        fontSize="11.5" fontWeight="500"
+        fontFamily="'SF Mono', Monaco, Inconsolata, 'Courier New', monospace"
+        fill={numFill}
+      >
+        {num}
+      </text>
+    )
+  }), [numFill]) // eslint-disable-line react-hooks/exhaustive-deps
+
   const ringR = R + 6
-  const WINDOW_H = 30 * 24
-  let ringEl: JSX.Element | null = null
+
+  // ── Day drain ── fraction of today still ahead (1 at midnight → 0 at the
+  // next midnight). Drives both the depleting ring and the sand-glass fill.
+  const dayFrac = dayRemaining(currentTime)
+
+  // Outer ring depletes counter-clockwise from 12 o'clock as the day runs out.
+  const sweep = dayFrac * 360
+  const ringStart = clockPoint(cx, 0, ringR)
+  const ringEnd = clockPoint(cx, -sweep, ringR)
+  const ringLargeArc = sweep > 180 ? 1 : 0
+
+  // Sand-glass liquid level inside the face: full at midnight, empty by midnight.
+  const fillR = R - 8
+  const fillTop = (cx - fillR) + (1 - dayFrac) * (2 * fillR)
+
+  // Nearest-deadline countdown chip (text only; the ring now tracks the day).
   let deadlineLabel: string | null = null
   if (nearest) {
-    const dColor = urgencyColor(nearest.hoursLeft)
-    const isOverdue = nearest.hoursLeft < 0
-    const frac = Math.max(0, Math.min(1, nearest.hoursLeft / WINDOW_H))
-    if (isOverdue) {
-      ringEl = <circle cx={cx} cy={cx} r={ringR} fill="none" stroke={dColor} strokeWidth="2.4" strokeOpacity="0.9" />
-    } else {
-      const sweep = frac * 360
-      const start = clockPoint(cx, 0, ringR)
-      const end = clockPoint(cx, -sweep, ringR)
-      const largeArc = sweep > 180 ? 1 : 0
-      ringEl = (
-        <path
-          d={`M ${start.x} ${start.y} A ${ringR} ${ringR} 0 ${largeArc} 0 ${end.x} ${end.y}`}
-          fill="none" stroke={dColor} strokeWidth="2.4" strokeLinecap="round"
-          style={{ transition: 'stroke 0.6s ease' }}
-        />
-      )
-    }
     const h = Math.abs(Math.round(nearest.hoursLeft))
     const compact = h >= 24 ? Math.round(h / 24) + 'D' : h + 'H'
-    deadlineLabel = isOverdue ? `+${compact}` : compact
+    deadlineLabel = nearest.hoursLeft < 0 ? `+${compact}` : compact
   }
 
   return (
     <div className="relative w-full aspect-square select-none">
       <svg className="w-full h-full" viewBox="0 0 200 200">
-        {/* faint full track behind the deadline ring */}
-        {nearest && (
-          <circle cx={cx} cy={cx} r={ringR} fill="none" stroke={tickMinor} strokeWidth="2.4" strokeOpacity="0.5" />
+        {/* Day-drain ring: faint full track + remaining arc */}
+        <circle cx={cx} cy={cx} r={ringR} fill="none" stroke={tickMinor} strokeWidth="2.4" strokeOpacity="0.5" />
+        {sweep > 0.5 && (
+          <path
+            d={`M ${ringStart.x} ${ringStart.y} A ${ringR} ${ringR} 0 ${ringLargeArc} 0 ${ringEnd.x} ${ringEnd.y}`}
+            fill="none" stroke={accent} strokeWidth="2.4" strokeLinecap="round"
+          />
         )}
-        {ringEl}
+
         <circle cx={cx} cy={cx} r={R + 2}  fill={faceFill} stroke={faceStroke} strokeWidth="1.5" />
         <circle cx={cx} cy={cx} r={R - 8}  fill="none"     stroke={faceStroke} strokeWidth="0.5" strokeOpacity="0.35" />
 
-        {Array.from({ length: 60 }, (_, i) => {
-          const a = (i * 6 - 90) * (Math.PI / 180)
-          const major = i % 5 === 0
-          const r1 = major ? R - 13 : R - 6
-          return (
-            <line key={i}
-              x1={cx + r1 * Math.cos(a)} y1={cx + r1 * Math.sin(a)}
-              x2={cx + R  * Math.cos(a)} y2={cx + R  * Math.sin(a)}
-              stroke={major ? tickMajor : tickMinor}
-              strokeWidth={major ? 1.6 : 0.8}
-            />
-          )
-        })}
+        {/* Sand-glass day fill — the face empties as the day's hours drain away */}
+        <defs>
+          <clipPath id="dayFillClip">
+            <circle cx={cx} cy={cx} r={fillR} />
+          </clipPath>
+        </defs>
+        <g clipPath="url(#dayFillClip)">
+          <rect x={cx - fillR} y={fillTop} width={2 * fillR} height={(cx + fillR) - fillTop}
+            fill={accent} fillOpacity="0.13" style={{ transition: 'y 1s linear, height 1s linear' }} />
+          <rect x={cx - fillR} y={fillTop} width={2 * fillR} height="1" fill={accent} fillOpacity="0.45" />
+        </g>
 
-        {LABELS.map((num, i) => {
-          const a = (i * 30 - 90) * (Math.PI / 180)
-          return (
-            <text key={num}
-              x={cx + labelR * Math.cos(a)}
-              y={cx + labelR * Math.sin(a)}
-              textAnchor="middle"
-              dominantBaseline="central"
-              fontSize="11.5"
-              fontWeight="500"
-              fontFamily="'SF Mono', Monaco, Inconsolata, 'Courier New', monospace"
-              fill={numFill}
-            >
-              {num}
-            </text>
-          )
-        })}
+        {ticks}
+        {labels}
 
         <line x1={cx} y1={cx} x2={hour4.x} y2={hour4.y}
           stroke={handHour} strokeWidth="4.5" strokeLinecap="round" />

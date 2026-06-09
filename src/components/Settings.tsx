@@ -1,6 +1,7 @@
 import { motion, AnimatePresence } from 'framer-motion'
 import { useStore } from '../store'
 import { useT, useDir } from '../i18n'
+import { ACCENT_ORDER, accentHex } from '../lib/colors'
 import { X } from 'lucide-react'
 
 export default function Settings({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
@@ -105,8 +106,8 @@ export default function Settings({ isOpen, onClose }: { isOpen: boolean; onClose
               <div>
                 <label className="block text-sm text-gray-400 mb-2">{T.accentColor}</label>
                 <div className="flex gap-3">
-                  {(['cyan', 'purple', 'amber', 'red'] as const).map((color) => {
-                    const hex = { cyan: '#2dd4bf', purple: '#8b5cf6', amber: '#f59e0b', red: '#f43f5e' }[color]
+                  {ACCENT_ORDER.map((color) => {
+                    const hex = accentHex(color)
                     const active = settings.accentColor === color
                     return (
                       <button

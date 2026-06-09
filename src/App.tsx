@@ -8,6 +8,7 @@ import FocusMode from "./components/FocusMode";
 import CommandPalette from "./components/CommandPalette";
 import Settings from "./components/Settings";
 import About from "./components/About";
+import LifeInWeeks from "./components/LifeInWeeks";
 import { useStore } from "./store";
 import { useT } from "./i18n";
 import { useDeadlineNotifications } from "./hooks/useDeadlineNotifications";
@@ -20,11 +21,19 @@ import {
   Sun,
   Moon,
   X,
+  LayoutGrid,
 } from "lucide-react";
 
 export default function App() {
-  const { settings, updateSettings, toggleFocusMode, setCommandPaletteOpen, toggleWidgetMode } =
-    useStore();
+  const {
+    settings,
+    updateSettings,
+    toggleFocusMode,
+    setCommandPaletteOpen,
+    toggleWidgetMode,
+    isLifeWeeksOpen,
+    setLifeWeeksOpen,
+  } = useStore();
   const T = useT();
   useDeadlineNotifications();
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
@@ -110,6 +119,7 @@ export default function App() {
         onClose={() => setIsSettingsOpen(false)}
       />
       <About isOpen={isAboutOpen} onClose={() => setIsAboutOpen(false)} />
+      <LifeInWeeks isOpen={isLifeWeeksOpen} onClose={() => setLifeWeeksOpen(false)} />
 
       <div className="flex flex-col gap-2 relative z-10 md:h-full">
         {/* Header */}
@@ -133,6 +143,13 @@ export default function App() {
               title="About"
             >
               <Info size={18} />
+            </button>
+            <button
+              onClick={() => setLifeWeeksOpen(true)}
+              className={btnCls}
+              title={T.lifeWeeks}
+            >
+              <LayoutGrid size={18} />
             </button>
             <button
               onClick={toggleFocusMode}
@@ -186,7 +203,7 @@ export default function App() {
         </div>
 
         {/* Context sentence — full-width banner, impossible to miss */}
-        <ContextSentence currentTime={currentTime} />
+        <ContextSentence />
 
         {/* Main grid — stacks on mobile, side-by-side on md+ */}
         <div className="md:flex-1 grid grid-cols-1 md:grid-cols-12 gap-3 md:min-h-0">

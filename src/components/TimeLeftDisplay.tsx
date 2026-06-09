@@ -1,14 +1,8 @@
 import React from 'react'
-import { endOfDay } from 'date-fns'
 import { useStore } from '../store'
 import { useT } from '../i18n'
-
-const ACCENT_TEXT: Record<string, string> = {
-  cyan:   'text-blue-500',
-  purple: 'text-purple-400',
-  amber:  'text-amber-400',
-  red:    'text-red-400',
-}
+import { accentHex } from '../lib/colors'
+import { msLeftToday, hms } from '../lib/time'
 
 function pad(n: number) {
   return String(n).padStart(2, '0')
@@ -18,13 +12,10 @@ function TimeLeftDisplay({ currentTime }: { currentTime: Date }) {
   const { settings } = useStore()
   const T = useT()
 
-  const msLeft = endOfDay(currentTime).getTime() - currentTime.getTime()
-  const hours   = Math.floor(msLeft / 3_600_000)
-  const minutes = Math.floor((msLeft % 3_600_000) / 60_000)
-  const seconds = Math.floor((msLeft % 60_000) / 1_000)
+  const { hours, minutes, seconds } = hms(msLeftToday(currentTime))
 
   const isDark = settings.darkMode
-  const accentCls = ACCENT_TEXT[settings.accentColor]
+  const accent = accentHex(settings.accentColor)
   const mutedCls = isDark ? 'text-gray-500' : 'text-gray-400'
   const sepCls   = isDark ? 'text-gray-600' : 'text-gray-300'
 
@@ -34,11 +25,11 @@ function TimeLeftDisplay({ currentTime }: { currentTime: Date }) {
         {T.timeRemainingToday}
       </p>
       <div className="flex items-baseline gap-0.5 font-mono tabular-nums leading-none">
-        <span className={`text-[3.6rem] font-bold ${accentCls}`}>{pad(hours)}</span>
+        <span className="text-[3.6rem] font-bold" style={{ color: accent }}>{pad(hours)}</span>
         <span className={`text-[2.4rem] font-light mx-0.5 ${sepCls}`}>:</span>
-        <span className={`text-[3.6rem] font-bold ${accentCls}`}>{pad(minutes)}</span>
+        <span className="text-[3.6rem] font-bold" style={{ color: accent }}>{pad(minutes)}</span>
         <span className={`text-[2.4rem] font-light mx-0.5 ${sepCls}`}>:</span>
-        <span className={`text-[3.6rem] font-bold ${accentCls}`}>{pad(seconds)}</span>
+        <span className="text-[3.6rem] font-bold" style={{ color: accent }}>{pad(seconds)}</span>
       </div>
       <p className={`font-mono text-[8px] tracking-[0.22em] mt-3 ${mutedCls}`}>
         {T.timeUnits}

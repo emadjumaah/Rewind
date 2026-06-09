@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <radialGradient id="glow" cx="78%" cy="25%" r="60%">
+      <stop offset="0%" stop-color="#2dd4bf" stop-opacity="0.22"/>
+      <stop offset="100%" stop-color="#030712" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1200" height="630" fill="#030712"/>
+  <rect width="1200" height="630" fill="url(#glow)"/>
+
+  <!-- week-grid motif -->
+  <g fill="#ffffff" fill-opacity="0.06">
+    <!-- generated rows of small squares, lower-right -->
+    <g transform="translate(900,420)">
+      <g>
+        <rect x="0" y="0" width="9" height="9" rx="1.5"/><rect x="16" y="0" width="9" height="9" rx="1.5"/><rect x="32" y="0" width="9" height="9" rx="1.5"/><rect x="48" y="0" width="9" height="9" rx="1.5"/><rect x="64" y="0" width="9" height="9" rx="1.5"/><rect x="80" y="0" width="9" height="9" rx="1.5"/><rect x="96" y="0" width="9" height="9" rx="1.5"/><rect x="112" y="0" width="9" height="9" rx="1.5"/><rect x="128" y="0" width="9" height="9" rx="1.5"/><rect x="144" y="0" width="9" height="9" rx="1.5"/><rect x="160" y="0" width="9" height="9" rx="1.5"/><rect x="176" y="0" width="9" height="9" rx="1.5"/><rect x="192" y="0" width="9" height="9" rx="1.5"/><rect x="208" y="0" width="9" height="9" rx="1.5"/>
+      </g>
+      <g transform="translate(0,16)">
+        <rect x="0" y="0" width="9" height="9" rx="1.5"/><rect x="16" y="0" width="9" height="9" rx="1.5"/><rect x="32" y="0" width="9" height="9" rx="1.5"/><rect x="48" y="0" width="9" height="9" rx="1.5"/><rect x="64" y="0" width="9" height="9" rx="1.5"/><rect x="80" y="0" width="9" height="9" rx="1.5"/><rect x="96" y="0" width="9" height="9" rx="1.5"/><rect x="112" y="0" width="9" height="9" rx="1.5"/><rect x="128" y="0" width="9" height="9" rx="1.5"/><rect x="144" y="0" width="9" height="9" rx="1.5"/><rect x="160" y="0" width="9" height="9" rx="1.5"/><rect x="176" y="0" width="9" height="9" rx="1.5"/><rect x="192" y="0" width="9" height="9" rx="1.5"/><rect x="208" y="0" width="9" height="9" rx="1.5"/>
+      </g>
+      <g transform="translate(0,32)">
+        <rect x="0" y="0" width="9" height="9" rx="1.5"/><rect x="16" y="0" width="9" height="9" rx="1.5"/><rect x="32" y="0" width="9" height="9" rx="1.5"/><rect x="48" y="0" width="9" height="9" rx="1.5"/><rect x="64" y="0" width="9" height="9" rx="1.5"/><rect x="80" y="0" width="9" height="9" rx="1.5"/><rect x="96" y="0" width="9" height="9" rx="1.5"/><rect x="112" y="0" width="9" height="9" rx="1.5"/><rect x="128" y="0" width="9" height="9" rx="1.5"/><rect x="144" y="0" width="9" height="9" rx="1.5"/><rect x="160" y="0" width="9" height="9" rx="1.5"/><rect x="176" y="0" width="9" height="9" rx="1.5"/><rect x="192" y="0" width="9" height="9" rx="1.5"/><rect x="208" y="0" width="9" height="9" rx="1.5"/>
+      </g>
+    </g>
+  </g>
+
+  <text x="90" y="115" font-family="'Courier New', monospace" font-size="30" font-weight="600" fill="#ffffff" fill-opacity="0.5" letter-spacing="6">REWIND</text>
+  <text x="86" y="320" font-family="Arial, sans-serif" font-size="120" font-weight="800" fill="#ffffff">Time, honestly.</text>
+  <text x="90" y="400" font-family="Arial, sans-serif" font-size="40" font-weight="600" fill="#2dd4bf">It only runs out.</text>
+  <text x="90" y="470" font-family="Arial, sans-serif" font-size="32" fill="#ffffff" fill-opacity="0.62">A backward clock and an honest look at the time you have left.</text>
+  <text x="90" y="580" font-family="'Courier New', monospace" font-size="26" fill="#ffffff" fill-opacity="0.35">rewind.uts.qa</text>
+</svg>

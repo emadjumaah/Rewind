@@ -5,34 +5,22 @@ import { useT, useDir } from "../i18n";
 import { differenceInDays, differenceInHours } from "date-fns";
 import { X, Plus, Edit } from "lucide-react";
 import DeadlineModal from "./DeadlineModal";
+import { urgencyCardClasses, urgencyColor } from "../lib/urgency";
 
-function getUrgencyColor(deadline: Date): string {
-  const hoursLeft = differenceInHours(deadline, new Date());
-  if (hoursLeft < 0)
-    return "border-2 border-red-700/70 shadow-md shadow-red-700/20 bg-gradient-to-br from-red-900/25 to-red-950/10";
-  if (hoursLeft < 24)
-    return "border-2 border-red-500/60 shadow-md shadow-red-500/20 bg-gradient-to-br from-red-500/15 to-red-900/5";
-  if (hoursLeft < 72)
-    return "border-2 border-amber-500/50 shadow-md shadow-amber-500/15 bg-gradient-to-br from-amber-500/10 to-amber-900/5";
-  if (hoursLeft < 168)
-    return "border border-blue-500/40 shadow-sm shadow-blue-500/10 bg-gradient-to-br from-blue-500/5 to-blue-900/5";
-  return "border border-blue-500/30 shadow-sm shadow-blue-500/5 bg-gradient-to-br from-blue-500/5 to-blue-900/5";
-}
+function getUrgencyText(deadline: Deadline, currentTime: Date, T: ReturnType<typeof useT>): string {
+  const date = deadline.deadline instanceof Date ? deadline.deadline : new Date(deadline.deadline);
+  const daysLeft = differenceInDays(date, currentTime);
+  const hoursLeft = differenceInHours(date, currentTime);
 
-function getUrgencyRingColor(deadline: Date): string {
-  const hoursLeft = differenceInHours(deadline, new Date());
-  if (hoursLeft < 0)  return "rgba(220, 38, 38, 0.9)";
-  if (hoursLeft < 24) return "rgba(239, 68, 68, 0.8)";
-  if (hoursLeft < 72) return "rgba(245, 158, 11, 0.8)";
-  if (hoursLeft < 168) return "rgba(59, 130, 246, 0.8)";
-  return "rgba(59, 130, 246, 0.8)";
-}
+  // Life countdowns have no "estimated hours" — they're just time, not a task.
+  if (deadline.category === 'life') {
+    if (hoursLeft < 0) return T.lifePassed(Math.abs(daysLeft));
+    if (daysLeft < 1) return T.lifeToday();
+    return T.lifeAway(daysLeft);
+  }
 
-function getUrgencyText(deadline: Date, estimatedHours: number, currentTime: Date, T: ReturnType<typeof useT>): string {
-  const daysLeft = differenceInDays(deadline, currentTime);
-  const hoursLeft = differenceInHours(deadline, currentTime);
+  const estimatedHours = deadline.estimatedHours;
   const workHoursLeft = Math.max(0, hoursLeft - daysLeft * 16);
-
   if (hoursLeft < 0)   return T.overdue(Math.abs(daysLeft));
   if (hoursLeft < 24)  return T.urgentCritical(hoursLeft, estimatedHours);
   if (hoursLeft < 72)  return T.urgentHigh(daysLeft, hoursLeft % 24, estimatedHours);
@@ -66,7 +54,7 @@ function DeadlineCard({
   const progress = Math.max(0, Math.min(1, hoursLeft / totalHours));
   const circumference = 2 * Math.PI * 45;
   const strokeDashoffset = circumference * (1 - progress);
-  const ringColor = getUrgencyRingColor(deadlineDate);
+  const ringColor = urgencyColor(hoursLeft);
   const isOverdue = hoursLeft < 0;
 
   return (
@@ -76,7 +64,7 @@ function DeadlineCard({
       transition={{ duration: 0.3 }}
       whileHover={{ scale: 1.015 }}
       whileTap={{ scale: 0.99 }}
-      className={`glass rounded-xl p-3 relative ${getUrgencyColor(deadlineDate)}`}
+      className={`glass rounded-xl p-3 relative ${urgencyCardClasses(hoursLeft)}`}
     >
       <button
         onClick={() => onRemove(deadline.id)}
@@ -105,7 +93,9 @@ function DeadlineCard({
               strokeDasharray={circumference}
               strokeDashoffset={strokeDashoffset}
               style={{
-                transform: "rotate(-90deg)",
+                // mirror, then rotate start to 12 o'clock, so it depletes
+                // counter-clockwise from the top — matching the clock ring
+                transform: "scaleX(-1) rotate(-90deg)",
                 transformOrigin: "50px 50px",
                 transition: "stroke-dashoffset 1s ease-out",
               }}
@@ -130,7 +120,7 @@ function DeadlineCard({
             )}
           </div>
           <p className="text-gray-400 text-xs leading-relaxed">
-            {getUrgencyText(deadlineDate, deadline.estimatedHours, currentTime, T)}
+            {getUrgencyText(deadline, currentTime, T)}
           </p>
           <p className="text-gray-500 text-[10px] mt-1 tabular-nums">
             {deadlineDate.toLocaleDateString("en-US", {

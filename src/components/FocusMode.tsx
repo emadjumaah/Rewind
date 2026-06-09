@@ -121,7 +121,7 @@ export default function FocusMode() {
                 initial={{ strokeDashoffset: 0 }}
                 animate={{ strokeDashoffset: 2 * Math.PI * 95 * (1 - progress) }}
                 transition={{ duration: 1 }}
-                style={{ transform: 'rotate(-90deg)', transformOrigin: '100px 100px' }}
+                style={{ transform: 'scaleX(-1) rotate(-90deg)', transformOrigin: '100px 100px' }}
               />
             </svg>
 

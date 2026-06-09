@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { useStore, Deadline } from '../store'
+import { useStore, Deadline, DeadlineCategory } from '../store'
 import { useT, useDir } from '../i18n'
-import { X } from 'lucide-react'
+import { X, Briefcase, Heart } from 'lucide-react'
 
 interface DeadlineModalProps {
   isOpen: boolean
@@ -18,23 +18,31 @@ export default function DeadlineModal({ isOpen, onClose, deadline }: DeadlineMod
   const [title, setTitle] = useState('')
   const [deadlineDate, setDeadlineDate] = useState('')
   const [estimatedHours, setEstimatedHours] = useState(8)
+  const [category, setCategory] = useState<DeadlineCategory>('work')
 
   useEffect(() => {
     if (deadline) {
       setTitle(deadline.title)
       setDeadlineDate(deadline.deadline.toISOString().slice(0, 16))
       setEstimatedHours(deadline.estimatedHours)
+      setCategory(deadline.category ?? 'work')
     } else {
       setTitle('')
       setDeadlineDate('')
       setEstimatedHours(8)
+      setCategory('work')
     }
   }, [deadline, isOpen])
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     if (!title || !deadlineDate) return
-    const deadlineData = { title, deadline: new Date(deadlineDate), estimatedHours }
+    const deadlineData = {
+      title,
+      deadline: new Date(deadlineDate),
+      estimatedHours: category === 'life' ? 0 : estimatedHours,
+      category,
+    }
     if (deadline) {
       updateDeadline(deadline.id, deadlineData)
     } else {
@@ -42,6 +50,8 @@ export default function DeadlineModal({ isOpen, onClose, deadline }: DeadlineMod
     }
     onClose()
   }
+
+  const lifePresets = [T.lifePresetBirthday, T.lifePresetTrip, T.lifePresetMilestone]
 
   return (
     <AnimatePresence>
@@ -72,15 +82,53 @@ export default function DeadlineModal({ isOpen, onClose, deadline }: DeadlineMod
 
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
+                <label className="block text-sm text-gray-400 mb-1">{T.categoryLabel}</label>
+                <div className="grid grid-cols-2 gap-2">
+                  {([
+                    { key: 'work' as const, label: T.categoryWork, icon: <Briefcase size={15} /> },
+                    { key: 'life' as const, label: T.categoryLife, icon: <Heart size={15} /> },
+                  ]).map((opt) => (
+                    <button
+                      key={opt.key}
+                      type="button"
+                      onClick={() => setCategory(opt.key)}
+                      className={`flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-sm transition-all ${
+                        category === opt.key
+                          ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30'
+                          : 'bg-white/5 text-gray-400 hover:bg-white/10 border border-transparent'
+                      }`}
+                    >
+                      {opt.icon}
+                      {opt.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div>
                 <label className="block text-sm text-gray-400 mb-1">{T.titleLabel}</label>
                 <input
                   type="text"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-gray-100 placeholder-gray-500 focus:outline-none focus:border-blue-500/50"
-                  placeholder={T.deadlinePlaceholder}
+                  placeholder={category === 'life' ? T.lifeTitlePlaceholder : T.deadlinePlaceholder}
                   required
                 />
+                {category === 'life' && (
+                  <div className="flex flex-wrap gap-1.5 mt-2">
+                    {lifePresets.map((p) => (
+                      <button
+                        key={p}
+                        type="button"
+                        onClick={() => setTitle(p)}
+                        className="text-xs px-2 py-1 rounded-md bg-white/5 text-gray-400 hover:bg-white/10 transition-colors"
+                      >
+                        {p}
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
 
               <div>
@@ -94,17 +142,18 @@ export default function DeadlineModal({ isOpen, onClose, deadline }: DeadlineMod
                 />
               </div>
 
-              <div>
-                <label className="block text-sm text-gray-400 mb-1">{T.estimatedHours}</label>
-                <input
-                  type="number"
-                  value={estimatedHours}
-                  onChange={(e) => setEstimatedHours(Number(e.target.value))}
-                  min="1"
-                  className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-gray-100 focus:outline-none focus:border-blue-500/50"
-                  required
-                />
-              </div>
+              {category === 'work' && (
+                <div>
+                  <label className="block text-sm text-gray-400 mb-1">{T.estimatedHours}</label>
+                  <input
+                    type="number"
+                    value={estimatedHours}
+                    onChange={(e) => setEstimatedHours(Number(e.target.value))}
+                    min="1"
+                    className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-gray-100 focus:outline-none focus:border-blue-500/50"
+                  />
+                </div>
+              )}
 
               <div className="flex gap-3 pt-2">
                 <button

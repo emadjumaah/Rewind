@@ -1,34 +1,21 @@
 import React from 'react'
-import { endOfYear, endOfDay, differenceInWeeks, isWeekend } from 'date-fns'
 import { useT } from '../i18n'
+import { msLeftToday, hms, weekendsLeftInYear, yearElapsed, workHoursLeftThisWeek } from '../lib/time'
 
 function TimeAnalytics({ currentTime }: { currentTime: Date }) {
   const T = useT()
 
-  const endOfDayDate = endOfDay(currentTime)
-  const endOfYearDate = endOfYear(currentTime)
-
-  const msLeftToday = endOfDayDate.getTime() - currentTime.getTime()
-  const hoursLeftToday = Math.floor(msLeftToday / (1000 * 60 * 60))
-  const minsLeftToday = Math.floor((msLeftToday % (1000 * 60 * 60)) / (1000 * 60))
-
-  const weekendsLeft = differenceInWeeks(endOfYearDate, currentTime) + (isWeekend(endOfYearDate) ? 1 : 0)
-
-  const yearStart = new Date(currentTime.getFullYear(), 0, 1)
-  const yearProgress = ((currentTime.getTime() - yearStart.getTime()) / (endOfYearDate.getTime() - yearStart.getTime())) * 100
-
-  const dayOfWeek = currentTime.getDay()
-  const isWorkday = dayOfWeek >= 1 && dayOfWeek <= 5
-  const totalMinsToday = currentTime.getHours() * 60 + currentTime.getMinutes()
-  const todayHoursLeft = isWorkday ? Math.max(0, (17 * 60 - totalMinsToday) / 60) : 0
-  const fullDaysAfterToday = isWorkday ? Math.max(0, 5 - dayOfWeek) : 0
-  const workHoursLeftWeek = Math.round(fullDaysAfterToday * 8 + todayHoursLeft)
+  const msToday = msLeftToday(currentTime)
+  const { hours: hoursLeftToday, minutes: minsLeftToday } = hms(msToday)
+  const weekendsLeft = weekendsLeftInYear(currentTime)
+  const yearPct = yearElapsed(currentTime) * 100
+  const workHoursLeftWeek = workHoursLeftThisWeek(currentTime)
 
   const analytics = [
     {
       label: T.todayLeft(hoursLeftToday, minsLeftToday),
       subtext: T.todaySubtext,
-      progress: msLeftToday / (24 * 60 * 60 * 1000),
+      progress: msToday / (24 * 60 * 60 * 1000),
     },
     {
       label: T.weekendsLeft(weekendsLeft),
@@ -36,9 +23,9 @@ function TimeAnalytics({ currentTime }: { currentTime: Date }) {
       progress: weekendsLeft / 52,
     },
     {
-      label: T.yearGone(yearProgress.toFixed(0), currentTime.getFullYear()),
+      label: T.yearGone(yearPct.toFixed(0), currentTime.getFullYear()),
       subtext: T.yearSubtext,
-      progress: 1 - yearProgress / 100,
+      progress: 1 - yearPct / 100,
     },
     {
       label: T.workHoursLeft(workHoursLeftWeek),
@@ -83,7 +70,7 @@ function TimeAnalytics({ currentTime }: { currentTime: Date }) {
                     strokeDasharray={circumference}
                     strokeDashoffset={strokeDashoffset}
                     style={{
-                      transform: 'rotate(-90deg)',
+                      transform: 'scaleX(-1) rotate(-90deg)',
                       transformOrigin: '30px 30px',
                       transition: 'stroke-dashoffset 1s linear',
                     }}

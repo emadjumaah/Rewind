@@ -1,16 +1,20 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
+import { AccentColor } from '../lib/colors'
+
+export type DeadlineCategory = 'work' | 'life'
 
 export interface Deadline {
   id: string
   title: string
   deadline: Date
   estimatedHours: number
+  category?: DeadlineCategory // defaults to 'work' when absent
   demo?: boolean
 }
 
 export interface Settings {
-  accentColor: 'cyan' | 'purple' | 'amber' | 'red'
+  accentColor: AccentColor
   motionIntensity: 'low' | 'medium' | 'high'
   timeFormat: '12h' | '24h'
   focusSessionLength: number
@@ -18,6 +22,8 @@ export interface Settings {
   darkMode: boolean
   language: 'en' | 'ar'
   notifications: boolean
+  birthDate?: string // ISO date (yyyy-mm-dd) for the Life in Weeks view
+  lifeExpectancy: number // years, for the Life in Weeks grid
 }
 
 interface AppState {
@@ -26,6 +32,7 @@ interface AppState {
   isFocusMode: boolean
   isCommandPaletteOpen: boolean
   isDeadlineModalOpen: boolean
+  isLifeWeeksOpen: boolean
   addDeadline: (deadline: Omit<Deadline, 'id'>) => void
   updateDeadline: (id: string, deadline: Omit<Deadline, 'id'>) => void
   removeDeadline: (id: string) => void
@@ -33,6 +40,7 @@ interface AppState {
   toggleFocusMode: () => void
   setCommandPaletteOpen: (open: boolean) => void
   setDeadlineModalOpen: (open: boolean) => void
+  setLifeWeeksOpen: (open: boolean) => void
   toggleWidgetMode: () => void
 }
 
@@ -58,6 +66,14 @@ const demoDeadlines: Deadline[] = [
     estimatedHours: 30,
     demo: true,
   },
+  {
+    id: 'demo-4',
+    title: 'Summer holiday',
+    deadline: new Date(Date.now() + 64 * 24 * 60 * 60 * 1000),
+    estimatedHours: 0,
+    category: 'life',
+    demo: true,
+  },
 ]
 
 export const useStore = create<AppState>()(
@@ -73,10 +89,12 @@ export const useStore = create<AppState>()(
         darkMode: true,
         language: 'en',
         notifications: false,
+        lifeExpectancy: 90,
       },
       isFocusMode: false,
       isCommandPaletteOpen: false,
       isDeadlineModalOpen: false,
+      isLifeWeeksOpen: false,
       addDeadline: (deadline) =>
         set((state) => ({
           deadlines: [...state.deadlines, { ...deadline, id: Date.now().toString() }],
@@ -98,6 +116,7 @@ export const useStore = create<AppState>()(
       toggleFocusMode: () => set((state) => ({ isFocusMode: !state.isFocusMode })),
       setCommandPaletteOpen: (open) => set({ isCommandPaletteOpen: open }),
       setDeadlineModalOpen: (open) => set({ isDeadlineModalOpen: open }),
+      setLifeWeeksOpen: (open) => set({ isLifeWeeksOpen: open }),
       toggleWidgetMode: () => set((state) => ({ settings: { ...state.settings, widgetMode: !state.settings.widgetMode } })),
     }),
     {
