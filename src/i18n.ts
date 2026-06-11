@@ -135,6 +135,7 @@ interface Translations {
   focusDone: string
   focusPause: string
   focusStart: string
+  focusWeekStats: (started: number, finished: number) => string
 
   // Widget
   widgetMode: string
@@ -264,6 +265,10 @@ const en: Translations = {
   focusDone: 'Done. Or you gave up. Either way, time passed.',
   focusPause: 'Pause',
   focusStart: 'Start',
+  focusWeekStats: (started, finished) =>
+    finished >= started
+      ? `This week: started ${started}, finished ${started}. Noted.`
+      : `This week: started ${started}, finished ${finished}. The gap says everything.`,
 
   widgetMode: 'Widget Mode',
   widgetExit: 'Press ⌘W to exit',
@@ -392,6 +397,10 @@ const ar: Translations = {
   focusDone: 'انتهيت، أو استسلمت. المهم أن الوقت مضى.',
   focusPause: 'إيقاف',
   focusStart: 'ابدأ',
+  focusWeekStats: (started, finished) =>
+    finished >= started
+      ? `هذا الأسبوع: بدأت ${started} وأنهيت ${started}. مسجَّل.`
+      : `هذا الأسبوع: بدأت ${started} وأنهيت ${finished}. الفرق يتحدث عن نفسه.`,
 
   widgetMode: 'وضع الأداة',
   widgetExit: 'اضغط ⌘W للخروج',

@@ -1,33 +1,87 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, Play, Pause } from 'lucide-react'
 import { useStore } from '../store'
 import { useT } from '../i18n'
 
 export default function FocusMode() {
-  const { isFocusMode, toggleFocusMode, settings } = useStore()
+  const { isFocusMode, toggleFocusMode, settings, focusSessions, recordFocusSession } = useStore()
   const T = useT()
-  const [timeLeft, setTimeLeft] = useState(settings.focusSessionLength * 60)
+  const targetSec = settings.focusSessionLength * 60
+  const [timeLeft, setTimeLeft] = useState(targetSec)
   const [isActive, setIsActive] = useState(false)
   const [showMessage, setShowMessage] = useState(true)
+  // Wall-clock deadline instead of decrementing state: browsers throttle
+  // background-tab intervals, which would silently stall the countdown.
+  const endAtRef = useRef<number | null>(null)
+  const sessionRef = useRef<{ startedAt: number; recorded: boolean } | null>(null)
+  const timeLeftRef = useRef(timeLeft)
+  timeLeftRef.current = timeLeft
+
+  const recordSession = useCallback(
+    (completed: boolean, remainingSec: number) => {
+      const session = sessionRef.current
+      if (!session || session.recorded) return
+      session.recorded = true
+      recordFocusSession({
+        startedAt: session.startedAt,
+        targetSec,
+        durationSec: targetSec - remainingSec,
+        completed,
+      })
+    },
+    [recordFocusSession, targetSec]
+  )
 
   useEffect(() => {
     if (!isFocusMode) {
+      // Closing mid-session counts as giving up. We keep the receipts.
+      recordSession(false, timeLeftRef.current)
+      sessionRef.current = null
+      endAtRef.current = null
       setTimeLeft(settings.focusSessionLength * 60)
       setIsActive(false)
       setShowMessage(true)
     }
-  }, [isFocusMode, settings.focusSessionLength])
+  }, [isFocusMode, settings.focusSessionLength, recordSession])
 
   useEffect(() => {
-    let interval: ReturnType<typeof setInterval>
-    if (isActive && timeLeft > 0) {
-      interval = setInterval(() => setTimeLeft((prev) => prev - 1), 1000)
-    } else if (timeLeft === 0) {
-      setIsActive(false)
+    if (!isActive) return
+    const tick = () => {
+      if (endAtRef.current === null) return
+      const remaining = Math.max(0, Math.round((endAtRef.current - Date.now()) / 1000))
+      setTimeLeft(remaining)
+      if (remaining === 0) {
+        setIsActive(false)
+        recordSession(true, 0)
+      }
     }
-    return () => clearInterval(interval)
-  }, [isActive, timeLeft])
+    const interval = setInterval(tick, 500)
+    // re-sync immediately when the tab comes back from background throttling
+    document.addEventListener('visibilitychange', tick)
+    return () => {
+      clearInterval(interval)
+      document.removeEventListener('visibilitychange', tick)
+    }
+  }, [isActive, recordSession])
+
+  const handleStartPause = () => {
+    if (isActive) {
+      setIsActive(false)
+    } else {
+      endAtRef.current = Date.now() + timeLeft * 1000
+      if (!sessionRef.current) {
+        sessionRef.current = { startedAt: Date.now(), recorded: false }
+      }
+      setIsActive(true)
+    }
+    setShowMessage(false)
+  }
+
+  const weekAgo = Date.now() - 7 * 24 * 60 * 60 * 1000
+  const thisWeek = focusSessions.filter((s) => s.startedAt > weekAgo)
+  const weekStarted = thisWeek.length
+  const weekFinished = thisWeek.filter((s) => s.completed).length
 
   const minutes = Math.floor(timeLeft / 60)
   const seconds = timeLeft % 60
@@ -85,14 +139,21 @@ export default function FocusMode() {
         <div className="text-center relative z-10">
           <AnimatePresence mode="wait">
             {showMessage && timeLeft === settings.focusSessionLength * 60 && (
-              <motion.p
+              <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
-                className="text-gray-400 text-lg mb-8 tracking-wide"
+                className="mb-8"
               >
-                {T.focusPrompt(settings.focusSessionLength)}
-              </motion.p>
+                <p className="text-gray-400 text-lg tracking-wide">
+                  {T.focusPrompt(settings.focusSessionLength)}
+                </p>
+                {weekStarted > 0 && (
+                  <p className="text-gray-600 text-sm mt-2 tracking-wide">
+                    {T.focusWeekStats(weekStarted, weekFinished)}
+                  </p>
+                )}
+              </motion.div>
             )}
           </AnimatePresence>
 
@@ -153,7 +214,7 @@ export default function FocusMode() {
               animate={{ opacity: 1, y: 0 }}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              onClick={() => { setIsActive(!isActive); setShowMessage(false) }}
+              onClick={handleStartPause}
               className={`mt-8 px-8 py-3 rounded-xl font-medium transition-all flex items-center gap-2 mx-auto ${
                 isActive
                   ? 'bg-red-500/20 text-red-400 border border-red-500/30 hover:bg-red-500/30'

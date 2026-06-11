@@ -13,6 +13,13 @@ export interface Deadline {
   demo?: boolean
 }
 
+export interface FocusSession {
+  startedAt: number // epoch ms
+  targetSec: number // what they committed to
+  durationSec: number // what they actually did
+  completed: boolean
+}
+
 export interface Settings {
   accentColor: AccentColor
   motionIntensity: 'low' | 'medium' | 'high'
@@ -28,6 +35,7 @@ export interface Settings {
 
 interface AppState {
   deadlines: Deadline[]
+  focusSessions: FocusSession[]
   settings: Settings
   isFocusMode: boolean
   isCommandPaletteOpen: boolean
@@ -36,6 +44,7 @@ interface AppState {
   addDeadline: (deadline: Omit<Deadline, 'id'>) => void
   updateDeadline: (id: string, deadline: Omit<Deadline, 'id'>) => void
   removeDeadline: (id: string) => void
+  recordFocusSession: (session: FocusSession) => void
   updateSettings: (settings: Partial<Settings>) => void
   toggleFocusMode: () => void
   setCommandPaletteOpen: (open: boolean) => void
@@ -80,6 +89,7 @@ export const useStore = create<AppState>()(
   persist(
     (set) => ({
       deadlines: demoDeadlines,
+      focusSessions: [],
       settings: {
         accentColor: 'cyan',
         motionIntensity: 'medium',
@@ -108,6 +118,10 @@ export const useStore = create<AppState>()(
       removeDeadline: (id) =>
         set((state) => ({
           deadlines: state.deadlines.filter((d) => d.id !== id),
+        })),
+      recordFocusSession: (session) =>
+        set((state) => ({
+          focusSessions: [...state.focusSessions, session].slice(-200),
         })),
       updateSettings: (settings) =>
         set((state) => ({
