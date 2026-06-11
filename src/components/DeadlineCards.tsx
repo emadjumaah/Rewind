@@ -7,6 +7,7 @@ import { X, Plus, Edit } from "lucide-react";
 import DeadlineModal from "./DeadlineModal";
 import DrainCircle from "./DrainCircle";
 import { urgencyCardClasses, urgencyColor } from "../lib/urgency";
+import { hoursUntil } from "../lib/time";
 
 function getUrgencyText(deadline: Deadline, currentTime: Date, T: ReturnType<typeof useT>): string {
   const date = deadline.deadline instanceof Date ? deadline.deadline : new Date(deadline.deadline);
@@ -144,6 +145,14 @@ function DeadlineCards({ currentTime }: { currentTime: Date }) {
     setIsModalOpen(true);
   };
 
+  // Honest ordering: the loudest thing first. Most overdue at the very top,
+  // then the soonest upcoming, with distant dates settling to the bottom.
+  const sorted = [...deadlines].sort((a, b) => {
+    const da = a.deadline instanceof Date ? a.deadline : new Date(a.deadline);
+    const db = b.deadline instanceof Date ? b.deadline : new Date(b.deadline);
+    return hoursUntil(da, currentTime) - hoursUntil(db, currentTime);
+  });
+
   return (
     <div className="flex flex-col md:h-full gap-2" dir={dir}>
       {/* Header — fixed, never scrolls away */}
@@ -173,7 +182,7 @@ function DeadlineCards({ currentTime }: { currentTime: Date }) {
       ) : (
         /* Scrollable list — fills remaining height on desktop, natural flow on mobile */
         <div className="deadline-list grid gap-2.5 md:overflow-y-auto md:flex-1 md:min-h-0 px-2 py-1">
-          {deadlines.map((deadline) => (
+          {sorted.map((deadline) => (
             <DeadlineCard
               key={deadline.id}
               deadline={deadline}

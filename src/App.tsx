@@ -9,9 +9,12 @@ import CommandPalette from "./components/CommandPalette";
 import Settings from "./components/Settings";
 import About from "./components/About";
 import LifeInWeeks from "./components/LifeInWeeks";
+import Logo from "./components/Logo";
 import { useStore } from "./store";
 import { useT } from "./i18n";
 import { useDeadlineNotifications } from "./hooks/useDeadlineNotifications";
+import { useTabTitle } from "./hooks/useTabTitle";
+import { useDrainingFavicon } from "./hooks/useDrainingFavicon";
 import { accentHex } from "./lib/colors";
 import { yearElapsed } from "./lib/time";
 import { drawShareCard, shareCard } from "./lib/shareCard";
@@ -43,6 +46,8 @@ export default function App() {
   } = useStore();
   const T = useT();
   useDeadlineNotifications();
+  useTabTitle();
+  useDrainingFavicon();
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isAboutOpen, setIsAboutOpen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -161,11 +166,14 @@ export default function App() {
       <div className="flex flex-col gap-2 relative z-10 md:h-full">
         {/* Header */}
         <div className="flex items-center justify-between px-4 md:px-6 py-1">
-          <h1
-            className={`text-xl font-semibold tracking-tight ${isDark ? "text-gray-100" : "text-gray-900"}`}
-          >
-            {T.appName}
-          </h1>
+          <div className="flex items-center gap-2.5">
+            <Logo size={26} />
+            <h1
+              className={`text-xl font-semibold tracking-tight ${isDark ? "text-gray-100" : "text-gray-900"}`}
+            >
+              {T.appName}
+            </h1>
+          </div>
           <div className="flex items-center gap-3 md:gap-4">
             {/* Primary actions */}
             <button onClick={() => setLifeWeeksOpen(true)} className={btnCls} title={T.lifeWeeks}>

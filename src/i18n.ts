@@ -8,6 +8,8 @@ interface Translations {
   // TimeLeftDisplay
   timeRemainingToday: string
   timeUnits: string
+  tabTitle: (clock: string) => string // shown in the browser tab when you look away
+  tabPulse: string // brief flash in the tab at the top of every hour
 
   // TimeAnalytics
   sectionTimeRemaining: string
@@ -145,6 +147,8 @@ const en: Translations = {
 
   timeRemainingToday: 'Time Remaining Today',
   timeUnits: 'HH · MM · SS',
+  tabTitle: (clock) => `${clock} left today`,
+  tabPulse: '⏳ another hour, gone.',
 
   sectionTimeRemaining: 'Time Remaining',
   todayLeft: (h, m) => `${h}h ${m}m left today`,
@@ -271,6 +275,8 @@ const ar: Translations = {
 
   timeRemainingToday: 'ما تبقّى من يومك',
   timeUnits: 'س · د · ث',
+  tabTitle: (clock) => `بقي ${clock} من يومك`,
+  tabPulse: '⏳ ساعة أخرى، ذهبت.',
 
   sectionTimeRemaining: 'ما تبقّى',
   todayLeft: (h, m) => `بقي من يومك ${h} ساعة و${m} دقيقة`,

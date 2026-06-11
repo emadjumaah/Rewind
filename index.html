@@ -17,15 +17,18 @@
     <meta property="og:title" content="Rewind — time, honestly." />
     <meta property="og:description" content="A backward clock and an honest look at the time you have left. Watch it go." />
     <meta property="og:url" content="https://rewind.uts.qa" />
-    <!-- og.svg ships in /public. For Twitter/Facebook, rasterize it to a
-         1200×630 og.png and swap the two refs below — they don't render SVG. -->
-    <meta property="og:image" content="https://rewind.uts.qa/og.svg" />
+    <!-- PNG, because Twitter/Facebook/WhatsApp/iMessage/Slack don't render SVG
+         og images. Regenerate from og.svg with:
+         chrome --headless --window-size=1200,630 --screenshot=public/og.png public/og.svg -->
+    <meta property="og:image" content="https://rewind.uts.qa/og.png" />
+    <meta property="og:image:type" content="image/png" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Rewind — a backward clock and an honest look at the time you have left." />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="Rewind — time, honestly." />
     <meta name="twitter:description" content="A backward clock and an honest look at the time you have left. Watch it go." />
-    <meta name="twitter:image" content="https://rewind.uts.qa/og.svg" />
+    <meta name="twitter:image" content="https://rewind.uts.qa/og.png" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
