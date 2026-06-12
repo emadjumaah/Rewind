@@ -2,7 +2,7 @@ import { useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useStore } from '../store'
 import { useT, useDir } from '../i18n'
-import { X, Clock, Settings as SettingsIcon, Plus, Trash2, RotateCcw, Moon, Sun, Monitor, LayoutGrid } from 'lucide-react'
+import { X, Clock, Settings as SettingsIcon, Plus, Trash2, RotateCcw, Moon, Sun, Monitor, LayoutGrid, Skull } from 'lucide-react'
 
 export default function CommandPalette() {
   const {
@@ -10,6 +10,7 @@ export default function CommandPalette() {
     setCommandPaletteOpen,
     setDeadlineModalOpen,
     setLifeWeeksOpen,
+    setGraveyardOpen,
     toggleFocusMode,
     deadlines,
     removeDeadline,
@@ -55,6 +56,13 @@ export default function CommandPalette() {
       label: T.cmdLifeWeeks,
       desc: T.cmdLifeWeeksDesc,
       action: () => { setLifeWeeksOpen(true); setCommandPaletteOpen(false) },
+      shortcut: '',
+    },
+    {
+      icon: <Skull size={18} />,
+      label: T.cmdGraveyard,
+      desc: T.cmdGraveyardDesc,
+      action: () => { setGraveyardOpen(true); setCommandPaletteOpen(false) },
       shortcut: '',
     },
     {

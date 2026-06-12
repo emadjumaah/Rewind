@@ -9,6 +9,7 @@ import CommandPalette from "./components/CommandPalette";
 import Settings from "./components/Settings";
 import About from "./components/About";
 import LifeInWeeks from "./components/LifeInWeeks";
+import Graveyard from "./components/Graveyard";
 import Logo from "./components/Logo";
 import { useStore } from "./store";
 import { useT } from "./i18n";
@@ -32,6 +33,7 @@ import {
   MoreHorizontal,
   Languages,
   Monitor,
+  Skull,
 } from "lucide-react";
 
 export default function App() {
@@ -43,6 +45,8 @@ export default function App() {
     toggleWidgetMode,
     isLifeWeeksOpen,
     setLifeWeeksOpen,
+    isGraveyardOpen,
+    setGraveyardOpen,
   } = useStore();
   const T = useT();
   useDeadlineNotifications();
@@ -162,6 +166,7 @@ export default function App() {
       />
       <About isOpen={isAboutOpen} onClose={() => setIsAboutOpen(false)} />
       <LifeInWeeks isOpen={isLifeWeeksOpen} onClose={() => setLifeWeeksOpen(false)} />
+      <Graveyard isOpen={isGraveyardOpen} onClose={() => setGraveyardOpen(false)} />
 
       <div className="flex flex-col gap-2 relative z-10 md:h-full">
         {/* Header */}
@@ -178,6 +183,9 @@ export default function App() {
             {/* Primary actions */}
             <button onClick={() => setLifeWeeksOpen(true)} className={btnCls} title={T.lifeWeeks}>
               <LayoutGrid size={18} />
+            </button>
+            <button onClick={() => setGraveyardOpen(true)} className={btnCls} title={T.graveyardTitle}>
+              <Skull size={18} />
             </button>
             <button onClick={handleShare} className={btnCls} title={T.share}>
               <Share2 size={18} />

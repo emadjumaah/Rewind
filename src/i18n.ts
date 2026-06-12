@@ -56,6 +56,26 @@ interface Translations {
   lifePresetTrip: string
   lifePresetMilestone: string
 
+  // Graveyard
+  graveyardTitle: string
+  graveyardIntro: string
+  graveyardEmpty: string
+  graveyardVerdictPrompt: string
+  graveyardBtnMadeIt: string
+  graveyardBtnMissed: string
+  graveyardBtnRest: string
+  graveyardBadgeMadeIt: string
+  graveyardBadgeMissed: string
+  graveyardBadgePassed: string
+  graveyardLifespan: (due: string, buried: string) => string
+  graveyardLate: (d: number) => string
+  graveyardCount: (n: number) => string
+  graveyardScore: (madeIt: number, missed: number) => string
+  graveyardCommentary: (madeIt: number, missed: number) => string
+  graveyardForget: string
+  cmdGraveyard: string
+  cmdGraveyardDesc: string
+
   // Life in Weeks
   lifeWeeks: string
   lifeWeeksIntro: string
@@ -193,6 +213,34 @@ const en: Translations = {
   lifePresetTrip: 'A trip',
   lifePresetMilestone: 'A milestone',
 
+  graveyardTitle: 'The Graveyard',
+  graveyardIntro: "Deadlines don't get deleted here. They get buried. The record stays.",
+  graveyardEmpty: 'No graves yet. Your failures are still upstairs.',
+  graveyardVerdictPrompt: "It's over. Did you make it?",
+  graveyardBtnMadeIt: 'Made it',
+  graveyardBtnMissed: "Didn't",
+  graveyardBtnRest: 'Lay it to rest',
+  graveyardBadgeMadeIt: 'Made it',
+  graveyardBadgeMissed: 'Missed',
+  graveyardBadgePassed: 'Came and went',
+  graveyardLifespan: (due, buried) => `due ${due} · buried ${buried}`,
+  graveyardLate: (d) => (d <= 0 ? 'on time, technically' : `${d}d late`),
+  graveyardCount: (n) => `${n} buried`,
+  graveyardScore: (madeIt, missed) => `${madeIt} made it · ${missed} missed`,
+  graveyardCommentary: (madeIt, missed) => {
+    const total = madeIt + missed
+    if (total === 0) return 'Nothing judged yet. The graveyard is patient.'
+    const rate = madeIt / total
+    if (rate === 1) return 'All of them made it. The graveyard is suspicious of you.'
+    if (rate >= 0.6) return 'Most made it. Better than expected, honestly.'
+    if (rate >= 0.4) return "Roughly a coin flip. The coin doesn't lose sleep."
+    if (rate > 0) return 'A coin flip would have done better.'
+    return "None made it. At least you're consistent."
+  },
+  graveyardForget: "Forget it. The record won't.",
+  cmdGraveyard: 'Visit the Graveyard',
+  cmdGraveyardDesc: 'Where missed deadlines rest. The record stays.',
+
   lifeWeeks: 'Life in Weeks',
   lifeWeeksIntro: 'Each dot is one week. The filled ones are gone. This is the honest picture.',
   lifeWeeksSetup: 'Enter your birth date to see your life, week by week.',
@@ -324,6 +372,34 @@ const ar: Translations = {
   lifePresetBirthday: 'عيد ميلاد',
   lifePresetTrip: 'رحلة',
   lifePresetMilestone: 'محطّة',
+
+  graveyardTitle: 'المقبرة',
+  graveyardIntro: 'هنا لا تُحذف المواعيد، بل تُدفن. والسجل يبقى.',
+  graveyardEmpty: 'لا قبور بعد. إخفاقاتك ما زالت في الأعلى.',
+  graveyardVerdictPrompt: 'انتهى الأمر. هل أنجزته؟',
+  graveyardBtnMadeIt: 'أنجزته',
+  graveyardBtnMissed: 'لم أنجزه',
+  graveyardBtnRest: 'ادفنه بسلام',
+  graveyardBadgeMadeIt: 'أُنجز',
+  graveyardBadgeMissed: 'فات',
+  graveyardBadgePassed: 'جاء ومضى',
+  graveyardLifespan: (due, buried) => `استُحق ${due} · دُفن ${buried}`,
+  graveyardLate: (d) => (d <= 0 ? 'في الوقت، نظرياً' : `متأخراً ${d} يوم`),
+  graveyardCount: (n) => `${n} مدفون`,
+  graveyardScore: (madeIt, missed) => `${madeIt} أُنجز · ${missed} فات`,
+  graveyardCommentary: (madeIt, missed) => {
+    const total = madeIt + missed
+    if (total === 0) return 'لا أحكام بعد. المقبرة صبورة.'
+    const rate = madeIt / total
+    if (rate === 1) return 'أنجزتها كلها. المقبرة تشكّ في أمرك.'
+    if (rate >= 0.6) return 'أنجزت معظمها. أفضل من المتوقع، بصراحة.'
+    if (rate >= 0.4) return 'قرعة عملة تقريباً. والعملة لا يؤرّقها شيء.'
+    if (rate > 0) return 'قرعة عملة كانت ستُبلي أحسن منك.'
+    return 'لم تُنجز شيئاً. على الأقل أنت ثابت على المبدأ.'
+  },
+  graveyardForget: 'انسَه. السجل لن ينسى.',
+  cmdGraveyard: 'زيارة المقبرة',
+  cmdGraveyardDesc: 'حيث ترقد المواعيد الفائتة. والسجل يبقى.',
 
   lifeWeeks: 'العمر بالأسابيع',
   lifeWeeksIntro: 'كل نقطة أسبوع. الممتلئة منها مضت. هذه هي الصورة الصادقة.',

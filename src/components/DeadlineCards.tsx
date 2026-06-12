@@ -42,6 +42,7 @@ function DeadlineCard({
   currentTime: Date;
 }) {
   const T = useT();
+  const buryDeadline = useStore((s) => s.buryDeadline);
   const deadlineDate =
     deadline.deadline instanceof Date
       ? deadline.deadline
@@ -107,6 +108,36 @@ function DeadlineCard({
           </p>
         </div>
       </div>
+
+      {/* The honest exit: overdue deadlines don't get deleted, they get buried */}
+      {isOverdue && (
+        <div className="mt-2.5 pt-2.5 pe-6 border-t border-white/10 flex items-center gap-2 flex-wrap">
+          {deadline.category === 'life' ? (
+            <button
+              onClick={() => buryDeadline(deadline.id, null)}
+              className="text-[11px] px-2.5 py-1 rounded-md border border-white/15 bg-white/5 text-gray-400 hover:text-gray-200 hover:bg-white/10 transition-colors"
+            >
+              ⚰ {T.graveyardBtnRest}
+            </button>
+          ) : (
+            <>
+              <span className="text-[11px] text-gray-400">{T.graveyardVerdictPrompt}</span>
+              <button
+                onClick={() => buryDeadline(deadline.id, true)}
+                className="text-[11px] px-2.5 py-1 rounded-md border border-emerald-500/30 bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 transition-colors"
+              >
+                {T.graveyardBtnMadeIt}
+              </button>
+              <button
+                onClick={() => buryDeadline(deadline.id, false)}
+                className="text-[11px] px-2.5 py-1 rounded-md border border-red-500/30 bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-colors"
+              >
+                {T.graveyardBtnMissed}
+              </button>
+            </>
+          )}
+        </div>
+      )}
 
       <button
         onClick={() => onEdit(deadline)}

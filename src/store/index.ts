@@ -13,6 +13,15 @@ export interface Deadline {
   demo?: boolean
 }
 
+export interface BuriedDeadline {
+  id: string
+  title: string
+  deadline: Date // when it was due
+  buriedAt: Date // when you finally admitted it
+  madeIt: boolean | null // null = life events; they just pass, no verdict
+  category?: DeadlineCategory
+}
+
 export interface FocusSession {
   startedAt: number // epoch ms
   targetSec: number // what they committed to
@@ -36,20 +45,25 @@ export interface Settings {
 interface AppState {
   deadlines: Deadline[]
   focusSessions: FocusSession[]
+  graveyard: BuriedDeadline[]
   settings: Settings
   isFocusMode: boolean
   isCommandPaletteOpen: boolean
   isDeadlineModalOpen: boolean
   isLifeWeeksOpen: boolean
+  isGraveyardOpen: boolean
   addDeadline: (deadline: Omit<Deadline, 'id'>) => void
   updateDeadline: (id: string, deadline: Omit<Deadline, 'id'>) => void
   removeDeadline: (id: string) => void
+  buryDeadline: (id: string, madeIt: boolean | null) => void
+  removeBuried: (id: string) => void
   recordFocusSession: (session: FocusSession) => void
   updateSettings: (settings: Partial<Settings>) => void
   toggleFocusMode: () => void
   setCommandPaletteOpen: (open: boolean) => void
   setDeadlineModalOpen: (open: boolean) => void
   setLifeWeeksOpen: (open: boolean) => void
+  setGraveyardOpen: (open: boolean) => void
   toggleWidgetMode: () => void
 }
 
@@ -90,6 +104,7 @@ export const useStore = create<AppState>()(
     (set) => ({
       deadlines: demoDeadlines,
       focusSessions: [],
+      graveyard: [],
       settings: {
         accentColor: 'cyan',
         motionIntensity: 'medium',
@@ -105,6 +120,7 @@ export const useStore = create<AppState>()(
       isCommandPaletteOpen: false,
       isDeadlineModalOpen: false,
       isLifeWeeksOpen: false,
+      isGraveyardOpen: false,
       addDeadline: (deadline) =>
         set((state) => ({
           deadlines: [...state.deadlines, { ...deadline, id: Date.now().toString() }],
@@ -119,6 +135,32 @@ export const useStore = create<AppState>()(
         set((state) => ({
           deadlines: state.deadlines.filter((d) => d.id !== id),
         })),
+      buryDeadline: (id, madeIt) =>
+        set((state) => {
+          const deadline = state.deadlines.find((d) => d.id === id)
+          if (!deadline) return state
+          return {
+            deadlines: state.deadlines.filter((d) => d.id !== id),
+            graveyard: [
+              {
+                id: deadline.id,
+                title: deadline.title,
+                deadline:
+                  deadline.deadline instanceof Date
+                    ? deadline.deadline
+                    : new Date(deadline.deadline),
+                buriedAt: new Date(),
+                madeIt,
+                category: deadline.category,
+              },
+              ...state.graveyard,
+            ].slice(0, 200),
+          }
+        }),
+      removeBuried: (id) =>
+        set((state) => ({
+          graveyard: state.graveyard.filter((d) => d.id !== id),
+        })),
       recordFocusSession: (session) =>
         set((state) => ({
           focusSessions: [...state.focusSessions, session].slice(-200),
@@ -131,10 +173,19 @@ export const useStore = create<AppState>()(
       setCommandPaletteOpen: (open) => set({ isCommandPaletteOpen: open }),
       setDeadlineModalOpen: (open) => set({ isDeadlineModalOpen: open }),
       setLifeWeeksOpen: (open) => set({ isLifeWeeksOpen: open }),
+      setGraveyardOpen: (open) => set({ isGraveyardOpen: open }),
       toggleWidgetMode: () => set((state) => ({ settings: { ...state.settings, widgetMode: !state.settings.widgetMode } })),
     }),
     {
       name: 'rewind-storage-v2',
+      // Persist data, not UI state — otherwise a reload with a modal or
+      // focus mode open restores it open, forever.
+      partialize: (state) => ({
+        deadlines: state.deadlines,
+        focusSessions: state.focusSessions,
+        graveyard: state.graveyard,
+        settings: state.settings,
+      }),
       storage: {
         getItem: (name) => {
           const str = localStorage.getItem(name)
@@ -144,6 +195,13 @@ export const useStore = create<AppState>()(
             parsed.state.deadlines = parsed.state.deadlines.map((d: any) => ({
               ...d,
               deadline: new Date(d.deadline),
+            }))
+          }
+          if (parsed.state?.graveyard) {
+            parsed.state.graveyard = parsed.state.graveyard.map((d: any) => ({
+              ...d,
+              deadline: new Date(d.deadline),
+              buriedAt: new Date(d.buriedAt),
             }))
           }
           return parsed
