@@ -1,5 +1,8 @@
 // Shared time math. Previously each component rolled its own date arithmetic.
-import { endOfDay, endOfYear, differenceInWeeks, isWeekend } from 'date-fns'
+import {
+  endOfDay, endOfYear, differenceInWeeks, isWeekend,
+  startOfWeek, endOfWeek, startOfMonth, endOfMonth, differenceInCalendarDays,
+} from 'date-fns'
 
 const DAY_MS = 86_400_000
 const HOUR_MS = 3_600_000
@@ -26,6 +29,21 @@ export function yearElapsed(now: Date): number {
   const end = endOfYear(now)
   return clamp01((now.getTime() - start.getTime()) / (end.getTime() - start.getTime()))
 }
+
+/** Fraction of [start, end] still ahead of `now` (1.0 at start, 0.0 at end). */
+function fractionLeft(now: Date, start: Date, end: Date): number {
+  return clamp01((end.getTime() - now.getTime()) / (end.getTime() - start.getTime()))
+}
+
+/** Fraction of the current week / month / year still ahead. */
+export const weekRemaining = (now: Date): number => fractionLeft(now, startOfWeek(now), endOfWeek(now))
+export const monthRemaining = (now: Date): number => fractionLeft(now, startOfMonth(now), endOfMonth(now))
+export const yearRemaining = (now: Date): number => 1 - yearElapsed(now)
+
+/** Whole calendar days left in the current week / month / year. */
+export const daysLeftInWeek = (now: Date): number => differenceInCalendarDays(endOfWeek(now), now)
+export const daysLeftInMonth = (now: Date): number => differenceInCalendarDays(endOfMonth(now), now)
+export const daysLeftInYear = (now: Date): number => differenceInCalendarDays(endOfYear(now), now)
 
 /** Weekends (Sat/Sun pairs, counted by weeks) left before year end. */
 export function weekendsLeftInYear(now: Date): number {

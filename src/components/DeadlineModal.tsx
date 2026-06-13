@@ -23,7 +23,13 @@ export default function DeadlineModal({ isOpen, onClose, deadline }: DeadlineMod
   useEffect(() => {
     if (deadline) {
       setTitle(deadline.title)
-      setDeadlineDate(deadline.deadline.toISOString().slice(0, 16))
+      // A datetime-local input speaks local wall-clock time. toISOString() is
+      // UTC, so feeding it directly shifted the value by the viewer's offset on
+      // every edit — re-saving an untouched deadline silently moved it. Offset
+      // by the timezone so the input shows the same local time it was set to.
+      const d = deadline.deadline
+      const local = new Date(d.getTime() - d.getTimezoneOffset() * 60000)
+      setDeadlineDate(local.toISOString().slice(0, 16))
       setEstimatedHours(deadline.estimatedHours)
       setCategory(deadline.category ?? 'work')
     } else {

@@ -4,6 +4,10 @@ import { AccentColor } from '../lib/colors'
 
 export type DeadlineCategory = 'work' | 'life'
 
+// Which horizon the clock's drain ring + sand-fill visualize. Tap the clock to
+// pull back from today all the way out to a whole life.
+export type ClockHorizon = 'day' | 'week' | 'month' | 'year' | 'life'
+
 export interface Deadline {
   id: string
   title: string
@@ -40,6 +44,7 @@ export interface Settings {
   notifications: boolean
   birthDate?: string // ISO date (yyyy-mm-dd) for the Life in Weeks view
   lifeExpectancy: number // years, for the Life in Weeks grid
+  clockHorizon: ClockHorizon // what the clock's drain ring tracks
 }
 
 interface AppState {
@@ -115,6 +120,7 @@ export const useStore = create<AppState>()(
         language: 'en',
         notifications: false,
         lifeExpectancy: 90,
+        clockHorizon: 'day',
       },
       isFocusMode: false,
       isCommandPaletteOpen: false,

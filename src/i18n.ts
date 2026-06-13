@@ -5,6 +5,13 @@ interface Translations {
   appName: string
   clockLabel: string
 
+  // Clock horizon (tap-to-zoom drain ring)
+  clockHorizonName: (h: 'day' | 'week' | 'month' | 'year' | 'life') => string
+  clockLeftHours: (h: number) => string
+  clockLeftDays: (d: number) => string
+  clockLeftWeeks: (w: number) => string
+  clockTapHint: string
+
   // TimeLeftDisplay
   timeRemainingToday: string
   timeUnits: string
@@ -166,6 +173,12 @@ const en: Translations = {
   appName: 'Rewind',
   clockLabel: 'REWIND',
 
+  clockHorizonName: (h) => ({ day: 'TODAY', week: 'THIS WEEK', month: 'THIS MONTH', year: 'THIS YEAR', life: 'YOUR LIFE' }[h]),
+  clockLeftHours: (h) => `${h}h left`,
+  clockLeftDays: (d) => `${d}d left`,
+  clockLeftWeeks: (w) => `${w.toLocaleString('en')}w left`,
+  clockTapHint: 'Tap the clock to zoom out',
+
   timeRemainingToday: 'Time Remaining Today',
   timeUnits: 'HH · MM · SS',
   tabTitle: (clock) => `${clock} left today`,
@@ -325,6 +338,12 @@ const en: Translations = {
 const ar: Translations = {
   appName: 'Rewind',
   clockLabel: 'REWIND',
+
+  clockHorizonName: (h) => ({ day: 'اليوم', week: 'هذا الأسبوع', month: 'هذا الشهر', year: 'هذا العام', life: 'حياتك' }[h]),
+  clockLeftHours: (h) => `${h.toLocaleString('ar')} ساعة`,
+  clockLeftDays: (d) => `${d.toLocaleString('ar')} يوم`,
+  clockLeftWeeks: (w) => `${w.toLocaleString('ar')} أسبوع`,
+  clockTapHint: 'انقر الساعة للتصغير',
 
   timeRemainingToday: 'ما تبقّى من يومك',
   timeUnits: 'س · د · ث',
